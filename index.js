@@ -27,11 +27,10 @@ const oauth2 = new jsforce.OAuth2({
 
 const app = express()
 
-app.use(bodyparser.json())
-
-const server = app.listen(process.env.PORT || 8080, () => {
-  util.logStartup(server, config, sf, oauth2)
-})
+app
+  .use(bodyparser.json())
+  .listen(process.env.PORT || 8080, () =>
+    util.logStartup(server, config, sf, oauth2))
 
 /* LOG ALL REQUESTS */
 
