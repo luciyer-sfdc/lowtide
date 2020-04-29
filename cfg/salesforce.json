@@ -1,0 +1,7 @@
+{
+  "rest" : {
+    "base_url" : "/services/data/",
+    "api_version" : "v47.0",
+    "subdirectory" : "/wave/"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "all" : "*",
+  "require_auth" : "/api/template/*",
+  "auth" : {
+    "request" : "/api/auth",
+    "callback" : "/api/auth/callback",
+    "revoke" : "/api/auth/revoke"
+  },
+  "repository" : {
+    "list" : "/api/repository/list"
+  },
+  "staging" : {
+    "create" : "/api/staging/create/:template_name",
+    "destroy" : "/api/staging/destroy/:folder_id"
+  },
+  "template" : {
+    "deploy" : "/api/template/deploy/:folder_id",
+    "retrieve" : "/api/template/retrieve"
+  }
+}
