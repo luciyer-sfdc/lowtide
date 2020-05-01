@@ -61,9 +61,13 @@ app.all(config.routes.require_auth, (req, res, next) => {
 
 app.get(config.routes.auth.internal, (req, res) => {
 
+  console.log(req.get("host"))
+  console.log(req.get("origin"))
+
   const session_object = {
     serverUrl: req.get("server_url"),
-    sessionId: req.get("session_id")
+    sessionId: req.get("session_id"),
+    version: "48.0"
   }
 
   console.log(session_object)
@@ -73,6 +77,12 @@ app.get(config.routes.auth.internal, (req, res) => {
   sf.connection = conn
 
   console.log(sf)
+
+  conn.query("SELECT Id, Name FROM Account", function(err, result) {
+    if (err) { return console.error(err); }
+    console.log("total : " + result.totalSize);
+    console.log("fetched : " + result.records.length);
+  });
 
   res.sendStatus(200)
 
