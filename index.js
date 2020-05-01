@@ -29,6 +29,7 @@ const app = express()
 
 app
   .use(bodyparser.json())
+  .use(express.urlencoded({ extended: true }))
   .listen(process.env.PORT || 8080, () =>
     util.logStartup(server, config, sf, oauth2))
 
@@ -53,6 +54,23 @@ app.all(config.routes.require_auth, (req, res, next) => {
   } else {
     next()
   }
+
+})
+
+/* ENABLE CONNECTIONS FROM SALESFORCE USING SESSION ID */
+
+app.post(config.routes.auth.internal, (req, res) => {
+
+  const conn = new jsforce.Connection({
+    serverUrl: req.body.server_url,
+    sessionId: req.body.session_id
+  })
+
+  console.log(conn)
+
+  sf.connection = conn
+
+  res.sendStatus(200)
 
 })
 
