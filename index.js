@@ -59,19 +59,20 @@ app.all(config.routes.require_auth, (req, res, next) => {
 
 /* ENABLE CONNECTIONS FROM SALESFORCE USING SESSION ID */
 
-app.post(config.routes.auth.internal, (req, res) => {
+app.get(config.routes.auth.internal, (req, res) => {
 
-  const conn = new jsforce.Connection({
-    serverUrl: req.body.server_url,
-    sessionId: req.body.session_id
-  })
+  const session_object = {
+    serverUrl: req.get("server_url"),
+    sessionId: req.get("session_id")
+  }
 
-  conn.recent(function(err, res) {
-    if (err) { return console.error(err); }
-    console.log(res);
-  });
+  console.log(session_object)
+
+  const conn = new jsforce.Connection(session_object)
 
   sf.connection = conn
+
+  console.log(sf)
 
   res.sendStatus(200)
 
