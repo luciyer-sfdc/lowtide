@@ -66,12 +66,9 @@ app.post(config.routes.auth.internal, (req, res) => {
     sessionId: req.body.session_id
   })
 
-  conn.identity(function(err, res) {
+  conn.recent(function(err, res) {
     if (err) { return console.error(err); }
-    console.log("user ID: " + res.user_id);
-    console.log("organization ID: " + res.organization_id);
-    console.log("username: " + res.username);
-    console.log("display name: " + res.display_name);
+    console.log(res);
   });
 
   sf.connection = conn
