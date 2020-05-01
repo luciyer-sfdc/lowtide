@@ -31,7 +31,7 @@ app
   .use(bodyparser.json())
   .use(express.urlencoded({ extended: true }))
   .listen(process.env.PORT || 8080, () =>
-    util.logStartup(server, config, sf, oauth2))
+    util.logStartup(config, sf, oauth2))
 
 /* LOG ALL REQUESTS */
 

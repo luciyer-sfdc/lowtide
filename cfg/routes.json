@@ -1,11 +1,11 @@
 {
   "all" : "*",
-  "require_auth" : "/api/template/*"
+  "require_auth" : "/api/template/*",
   "auth" : {
     "request" : "/api/auth",
     "callback" : "/api/auth/callback",
     "revoke" : "/api/auth/revoke",
-    "internal" : "/api/auth/internal",
+    "internal" : "/api/auth/internal"
   },
   "repository" : {
     "list" : "/api/repository/list"

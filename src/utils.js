@@ -1,5 +1,4 @@
-exports.logStartup = (server, config, sf, oauth2) => {
-  console.log("### SERVER ###\n", server.address())
+exports.logStartup = (config, sf, oauth2) => {
   console.log("### SALESFORCE ###\n", sf)
   console.log("### API ROUTES ###\n", config.routes)
   console.log("### OAUTH ###\n", oauth2)
