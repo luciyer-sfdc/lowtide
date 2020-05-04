@@ -44,6 +44,20 @@ app.all(config.routes.all, (req, res, next) => {
 
 app.all(config.routes.require_auth, (req, res, next) => {
 
+  if (req.get("source") === "internal") {
+
+    const session_object = {
+      serverUrl: req.get("server_url"),
+      sessionId: req.get("session_id"),
+      version: "48.0"
+    }
+
+    sf.connection = new jsforce.Connection(session_object)
+
+    next()
+
+  }
+
   if (req.url !== config.routes.auth.request &&
       req.path !== config.routes.auth.callback &&
       !sf.connection) {
@@ -54,37 +68,6 @@ app.all(config.routes.require_auth, (req, res, next) => {
   } else {
     next()
   }
-
-})
-
-/* ENABLE CONNECTIONS FROM SALESFORCE USING SESSION ID */
-
-app.get(config.routes.auth.internal, (req, res) => {
-
-  console.log(req.get("host"))
-  console.log(req.get("origin"))
-
-  const session_object = {
-    serverUrl: req.get("server_url"),
-    sessionId: req.get("session_id"),
-    version: "48.0"
-  }
-
-  console.log(session_object)
-
-  const conn = new jsforce.Connection(session_object)
-
-  sf.connection = conn
-
-  console.log(sf)
-
-  conn.query("SELECT Id, Name FROM Account", function(err, result) {
-    if (err) { return console.error(err); }
-    console.log("total : " + result.totalSize);
-    console.log("fetched : " + result.records.length);
-  });
-
-  res.sendStatus(200)
 
 })
 

@@ -4,8 +4,7 @@
   "auth" : {
     "request" : "/api/auth",
     "callback" : "/api/auth/callback",
-    "revoke" : "/api/auth/revoke",
-    "internal" : "/api/auth/internal"
+    "revoke" : "/api/auth/revoke"
   },
   "repository" : {
     "list" : "/api/repository/list"
