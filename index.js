@@ -44,8 +44,7 @@ app.all(config.routes.all, (req, res, next) => {
 
 app.all(config.routes.require_auth, (req, res, next) => {
 
-  if (req.get("source") === "internal" &&
-      !sf.connection) {
+  if (req.get("source") === "internal") {
 
     const session_object = {
       serverUrl: req.get("server_url"),

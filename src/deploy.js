@@ -22,10 +22,15 @@ exports.fromDirectory = (conn, packageDirectoryPath) => {
   archive.glob(dirname + '/**', { cwd: cwd })
   archive.finalize()
 
+  conn.metadata.pollTimeout = 60*1000;
+
   conn.metadata.deploy(archive, {})
-    .complete((err, result) => {
+    .complete(true, (err, result) => {
       if (err) { console.error(err) }
-      console.log("Result", result)
+      if (result) {
+        console.log("Result", result)
+        console.log("Errors", result.details.componentFailures)
+      }
     })
 
 }
