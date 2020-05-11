@@ -54,16 +54,16 @@ app
 
           req.session.salesforce.source = "internal"
 
-          const session_object = {
+          req.session.salesforce.authInfo = {
             serverUrl: req.get("sf_server_url"),
             sessionId: req.get("sf_session_id"),
             version: process.env.API_VERSION
           }
 
-          const conn = new jsforce.Connection(session_object)
+          const conn = new jsforce.Connection(req.session.salesforce.authInfo)
 
-          console.log("inspect conn", inspect(conn))
-          console.log("inspect req", inspect(req))
+          req.session.salesforce.accessToken = conn.accessToken
+          req.session.salesforce.instanceUrl = conn.instanceUrl
 
           next()
 
@@ -96,6 +96,7 @@ app
     util.logStartup(config, oauth2))
 
 app.get("/", (req, res) => {
+  console.log(req.session)
   res.status(200).json({ message: "homepage here" })
 })
 
