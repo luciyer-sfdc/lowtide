@@ -67,7 +67,7 @@ app
 
         } else {
           // OAuth2
-          res.redirect(config.routes.auth.request)
+          res.redirect(oauth2.getAuthorizationUrl())
 
           next()
 
@@ -135,10 +135,6 @@ app.get("/", (req, res) => {
   })
 })
 
-
-app.get(config.routes.auth.request, (req, res) => {
-  res.redirect(oauth2.getAuthorizationUrl())
-})
 
 app.get(config.routes.auth.callback, (req, res) => {
 
