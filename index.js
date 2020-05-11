@@ -97,7 +97,6 @@ app
 
 app.get("/", (req, res) => {
   console.log("Session:", req.sessionID)
-  console.log("Details:", req.session)
   res.status(200).json({ message: "homepage here" })
 })
 
