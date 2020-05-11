@@ -65,7 +65,7 @@ app
 
         } else {
           // OAuth2
-          res.redirect(oauth2.getAuthorizationUrl())
+          res.redirect(config.routes.auth.request)
 
           next()
 
@@ -133,6 +133,9 @@ app.get("/", (req, res) => {
   })
 })
 
+app.get(config.routes.auth.request, (req, res) => {
+  res.redirect(oauth2.getAuthorizationUrl())
+})
 
 app.get(config.routes.auth.callback, (req, res) => {
 
@@ -144,6 +147,7 @@ app.get(config.routes.auth.callback, (req, res) => {
 
       util.logAuth(conn, userInfo)
 
+      req.session.salesforce = {}
       req.session.salesforce.source = "oauth2"
 
       req.session.salesforce.authInfo = {
