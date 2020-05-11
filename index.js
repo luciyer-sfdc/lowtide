@@ -65,7 +65,7 @@ app
 
         } else {
           // OAuth2
-          res.redirect(config.routes.auth.request)
+          res.redirect(oauth2.getAuthorizationUrl())
         }
 
       } catch (err) {
@@ -128,10 +128,6 @@ app.get("/", (req, res) => {
     message: "Authentication Successful.",
     sessionId: req.sessionID
   })
-})
-
-app.get(config.routes.auth.request, (req, res) => {
-  res.redirect(oauth2.getAuthorizationUrl())
 })
 
 app.get(config.routes.auth.callback, (req, res) => {
