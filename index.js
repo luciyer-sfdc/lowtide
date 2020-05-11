@@ -61,12 +61,9 @@ app
             version: process.env.API_VERSION
           }
 
-          const conn =
-            new jsforce.Connection(session_object)
+          const conn = new jsforce.Connection(session_object)
 
-          console.log(conn)
-          console.log(conn._conn)
-          console.log(conn.analytics)
+          req.session.sf.mdapi = conn.metadata
 
           next()
 
