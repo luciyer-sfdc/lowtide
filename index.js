@@ -41,9 +41,6 @@ app
 
       console.log("No Salesforce session. Initializing...")
 
-      req.session.salesforce = {}
-      req.session.salesforce.endpoint = process.env.API_ENDPOINT
-
       try {
 
         // Authenticate and create staging folder.
@@ -51,6 +48,7 @@ app
         if (req.get("source") === "internal") {
           // Session ID & Server URL
 
+          req.session.salesforce = {}
           req.session.salesforce.source = "internal"
 
           req.session.salesforce.authInfo = {
@@ -81,7 +79,7 @@ app
       }
 
     } else {
-      console.log("Salesforce session found:", req.sessionID)
+      console.log("Salesforce session found on session:", req.sessionID)
       next()
     }
 
