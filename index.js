@@ -1,5 +1,6 @@
 require("dotenv").config()
 
+const { inspect } = require("util")
 const { v4: uuidv4 } = require("uuid")
 const shortid = require("shortid")
 const jsforce = require("jsforce")
@@ -42,7 +43,7 @@ app
       console.log("No Salesforce session. Initializing...")
 
       req.session.sf = {}
-      req.session.sf.endpoint = process.env.API_ENDPOINT
+      //req.session.sf.endpoint = process.env.API_ENDPOINT
 
       try {
 
@@ -60,6 +61,8 @@ app
           }
 
           req.session.sf.connection = new jsforce.Connection(session_object)
+
+          console.log(inspect(req.session))
 
           next()
 
