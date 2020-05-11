@@ -54,14 +54,14 @@ app
           // Session ID & Server URL
 
           req.session.salesforce.source = "internal"
-          
+
           const session_object = {
             serverUrl: req.get("server_url"),
             sessionId: req.get("session_id"),
             version: process.env.API_VERSION
           }
 
-          req.session.salesforce.connection =
+          req.session.salesforce.conn =
             new jsforce.Connection(session_object)
 
           next()
