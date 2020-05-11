@@ -39,12 +39,12 @@ app
 
   app.use(function (req, res, next) {
 
-    if (!req.session.salesforce) {
+    if (!req.session.sf) {
 
       console.log("No Salesforce session. Initializing...")
 
-      req.session.salesforce = {}
-      req.session.salesforce.endpoint = process.env.API_ENDPOINT
+      req.session.sf = {}
+      req.session.sf.endpoint = process.env.API_ENDPOINT
 
       try {
 
@@ -53,7 +53,7 @@ app
         if (req.get("source") === "internal") {
           // Session ID & Server URL
 
-          req.session.salesforce.source = "internal"
+          req.session.sf.source = "internal"
 
           const session_object = {
             serverUrl: req.get("server_url"),
@@ -61,7 +61,7 @@ app
             version: process.env.API_VERSION
           }
 
-          req.session.salesforce.conn =
+          req.session.sf.conn =
             new jsforce.Connection(session_object)
 
           next()
@@ -69,7 +69,7 @@ app
         } else {
           // OAuth2
 
-          req.session.salesforce.source = "oauth2"
+          req.session.sf.source = "oauth2"
           //res.redirect(config.routes.auth.request)
 
           next()
