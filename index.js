@@ -28,8 +28,6 @@ app
   .use(express.urlencoded({ extended: true }))
   .use(session({
     genid: (req) => {
-      console.log("MW | Session ID:", req.sessionID)
-      console.log("MW | Salesforce:", req.session)
       return uuidv4()
     },
     secret: "some secret here stored in process.env",
@@ -61,9 +59,7 @@ app
             version: process.env.API_VERSION
           }
 
-          const conn = new jsforce.Connection(session_object)
-
-          req.session.sf.mdapi = conn.metadata
+          req.session.sf.connection = new jsforce.Connection(session_object)
 
           next()
 
@@ -96,7 +92,6 @@ app
     util.logStartup(config, oauth2))
 
 app.get("/", (req, res) => {
-  console.log("Session:", req.sessionID)
   res.status(200).json({ message: "homepage here" })
 })
 
