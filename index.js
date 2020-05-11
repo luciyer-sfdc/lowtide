@@ -1,8 +1,10 @@
 require("dotenv").config()
 
+const { v4: uuidv4 } = require("uuid")
 const shortid = require("shortid")
 const jsforce = require("jsforce")
 const express = require("express")
+const session = require("express-session")
 const bodyparser = require("body-parser")
 const middleware = require('express-async-handler')
 
@@ -12,12 +14,6 @@ const lowtide = require("./src"),
       package = lowtide.package,
       repository = lowtide.repository,
       deploy = lowtide.deploy
-
-const sf = {
-  connection: null,
-  on_connect_redirect: null,
-  endpoint: config.sf_endpoint
-}
 
 const oauth2 = new jsforce.OAuth2({
   clientId: process.env.CLIENT_ID,
@@ -30,17 +26,80 @@ const app = express()
 app
   .use(bodyparser.json())
   .use(express.urlencoded({ extended: true }))
-  .listen(process.env.PORT || 8080, () =>
-    util.logStartup(config, sf, oauth2))
+  .use(session({
+    genid: (req) => {
+      console.log("MW | Session ID:", req.sessionID)
+      console.log("MW | Salesforce:", req.session)
+      return uuidv4()
+    },
+    secret: "some secret here stored in process.env",
+    resave: false,
+    saveUninitialized: true
+  }))
 
-/* LOG ALL REQUESTS */
+  app.use(function (req, res, next) {
+
+    if (!req.session.salesforce) {
+
+      console.log("No Salesforce session. Initializing...")
+
+      req.session.salesforce = {}
+      req.session.salesforce.endpoint = process.env.API_ENDPOINT
+
+      try {
+
+        // Authenticate and create staging folder.
+
+        if (req.get("source") === "internal") {
+          // Session ID & Server URL
+
+          req.session.salesforce.source = "internal"
+
+          next()
+
+        } else {
+          // OAuth2
+
+          req.session.salesforce.source = "oauth2"
+          //res.redirect(config.routes.auth.request)
+
+          next()
+
+        }
+
+      } catch (err) {
+
+        // Return error and delete staging folder.
+        console.error(err)
+
+      }
+
+    } else {
+      console.log("Salesforce session found.")
+      next()
+    }
+
+  })
+
+app
+  .listen(process.env.PORT || 8080, () =>
+    util.logStartup(config, oauth2))
+
+app.get("/", (req, res) => {
+  console.log("Session:", req.sessionID)
+  console.log("Details:", req.session)
+  res.status(200).json({ message: "homepage here" })
+})
+
+/*
+
 
 app.all(config.routes.all, (req, res, next) => {
   console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
   next()
 })
 
-/* CATCH REQUESTS REQUIRING AUTH */
+
 
 app.all(config.routes.require_auth, (req, res, next) => {
 
@@ -69,7 +128,7 @@ app.all(config.routes.require_auth, (req, res, next) => {
 
 })
 
-/* AUTHENTICATION */
+
 
 app.get(config.routes.auth.request, (req, res) => {
   res.redirect(oauth2.getAuthorizationUrl())
@@ -126,7 +185,7 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "homepage here" })
 })
 
-/* REPOSITORY */
+
 
 app.get(config.routes.repository.list, (req, res) => {
   repository.getTemplateList().then(list => {
@@ -136,7 +195,7 @@ app.get(config.routes.repository.list, (req, res) => {
   })
 })
 
-/* STAGING */
+
 
 app.get(config.routes.staging.create, middleware(async(req, res, next) => {
 
@@ -177,7 +236,7 @@ app.get(config.routes.staging.destroy, (req, res) => {
 
 })
 
-/* TEMPLATE */
+
 
 app.get(config.routes.template.deploy, (req, res) => {
 
@@ -190,3 +249,5 @@ app.get(config.routes.template.deploy, (req, res) => {
 app.get(config.routes.template.retrieve, (req, res) => {
   res.sendStatus(200)
 })
+
+*/
