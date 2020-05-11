@@ -61,8 +61,12 @@ app
             version: process.env.API_VERSION
           }
 
-          req.session.sf.conn =
+          const conn =
             new jsforce.Connection(session_object)
+
+          console.log(conn)
+          console.log(conn._conn)
+          console.log(conn.analytics)
 
           next()
 
