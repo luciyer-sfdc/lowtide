@@ -66,9 +66,6 @@ app
         } else {
           // OAuth2
           res.redirect(config.routes.auth.request)
-
-          next()
-
         }
 
       } catch (err) {
