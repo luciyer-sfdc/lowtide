@@ -38,38 +38,39 @@ app
 
   app.use(function (req, res, next) {
 
-    if (!req.session.sf) {
+    if (!req.session.salesforce) {
 
       console.log("No Salesforce session. Initializing...")
 
-      req.session.sf = {}
-      //req.session.sf.endpoint = process.env.API_ENDPOINT
+      req.session.salesforce = {}
+      req.session.salesforce.endpoint = process.env.API_ENDPOINT
 
       try {
 
         // Authenticate and create staging folder.
 
-        if (req.get("source") === "internal") {
+        if (req.get("sf_source") === "internal") {
           // Session ID & Server URL
 
-          req.session.sf.source = "internal"
+          req.session.salesforce.source = "internal"
 
           const session_object = {
-            serverUrl: req.get("server_url"),
-            sessionId: req.get("session_id"),
+            serverUrl: req.get("sf_server_url"),
+            sessionId: req.get("sf_session_id"),
             version: process.env.API_VERSION
           }
 
-          req.session.sf.connection = new jsforce.Connection(session_object)
+          const conn = new jsforce.Connection(session_object)
 
-          console.log(inspect(req.session))
+          console.log("inspect conn", inspect(conn))
+          console.log("inspect req", inspect(req))
 
           next()
 
         } else {
           // OAuth2
 
-          req.session.sf.source = "oauth2"
+          req.session.salesforce.source = "oauth2"
           //res.redirect(config.routes.auth.request)
 
           next()
