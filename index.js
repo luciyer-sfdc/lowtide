@@ -1,6 +1,5 @@
 require("dotenv").config()
 
-const { inspect } = require("util")
 const { v4: uuidv4 } = require("uuid")
 const shortid = require("shortid")
 const jsforce = require("jsforce")
@@ -49,29 +48,26 @@ app
 
         // Authenticate and create staging folder.
 
-        if (req.get("sf_source") === "internal") {
+        if (req.get("source") === "internal") {
           // Session ID & Server URL
 
           req.session.salesforce.source = "internal"
 
           req.session.salesforce.authInfo = {
-            serverUrl: req.get("sf_server_url"),
-            sessionId: req.get("sf_session_id"),
+            serverUrl: req.get("server_url"),
+            sessionId: req.get("session_id"),
             version: process.env.API_VERSION
           }
 
           const conn = new jsforce.Connection(req.session.salesforce.authInfo)
 
-          req.session.salesforce.accessToken = conn.accessToken
-          req.session.salesforce.instanceUrl = conn.instanceUrl
+          req.session.salesforce.authInfo.accessToken = conn.accessToken
 
           next()
 
         } else {
           // OAuth2
-
-          req.session.salesforce.source = "oauth2"
-          //res.redirect(config.routes.auth.request)
+          res.redirect(config.routes.auth.request)
 
           next()
 
@@ -85,7 +81,7 @@ app
       }
 
     } else {
-      console.log("Salesforce session found.")
+      console.log("Salesforce session found:", req.sessionID)
       next()
     }
 
@@ -95,20 +91,12 @@ app
   .listen(process.env.PORT || 8080, () =>
     util.logStartup(config, oauth2))
 
-app.get("/", (req, res) => {
-  console.log(req.session)
-  res.status(200).json({ message: "homepage here" })
-})
-
-/*
-
-
 app.all(config.routes.all, (req, res, next) => {
   console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
   next()
 })
 
-
+/*
 
 app.all(config.routes.require_auth, (req, res, next) => {
 
@@ -137,6 +125,15 @@ app.all(config.routes.require_auth, (req, res, next) => {
 
 })
 
+*/
+
+app.get("/", (req, res) => {
+  console.log(req.session)
+  res.status(200).json({
+    message: "Authentication Successful.",
+    sessionId: req.sessionID
+  })
+})
 
 
 app.get(config.routes.auth.request, (req, res) => {
@@ -153,12 +150,11 @@ app.get(config.routes.auth.callback, (req, res) => {
 
       util.logAuth(conn, userInfo)
 
-      sf.connection = conn;
+      req.session.salesforce.source = "oauth2"
 
-      if (sf.on_connect_redirect) {
-        res.redirect(sf.on_connect_redirect)
-      } else {
-        res.redirect("/")
+      req.session.salesforce.authInfo = {
+        accessToken: conn.accessToken,
+        serverUrl: conn.instanceUrl
       }
 
     } else {
@@ -169,6 +165,8 @@ app.get(config.routes.auth.callback, (req, res) => {
   })
 
 })
+
+/*
 
 app.get(config.routes.auth.revoke, (req, res) => {
 
