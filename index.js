@@ -9,6 +9,7 @@ const bodyparser = require("body-parser")
 const middleware = require('express-async-handler')
 
 const lowtide = require("./src"),
+      auth = lowtide.auth,
       util = lowtide.util,
       config = lowtide.config,
       package = lowtide.package,
@@ -42,23 +43,31 @@ app
 
       console.log("No Salesforce session. Initializing...")
 
+      req.session.salesforce = {}
+
       try {
 
-        if (req.get("source") === "internal") {
+        if (req.get("source") === "session") {
 
-          req.session.salesforce = {}
+          req.session.salesforce = auth.storeResponse(req, "session")
+
+          /*
           req.session.salesforce.source = "internal"
+          req.session.salesforce.authResponse = {}
 
-          req.session.salesforce.authInfo = {
+          req.session.salesforce.authCredentials = {
             serverUrl: req.get("server_url"),
             sessionId: req.get("session_id"),
             version: process.env.API_VERSION
           }
 
-          const conn = new jsforce.Connection(req.session.salesforce.authInfo)
+          const conn = new jsforce.Connection(req.session.salesforce.authCredentials)
 
-          req.session.salesforce.authInfo.accessToken = conn.accessToken
 
+          req.session.salesforce.authResponse.accessToken = conn.accessToken
+          req.session.salesforce.authResponse.instanceUrl = conn.instanceUrl
+          */
+          
           next()
 
         } else {
@@ -125,6 +134,11 @@ app.get("/", (req, res) => {
     message: "Authentication Successful.",
     sessionId: req.sessionID
   })
+})
+
+app.get("/test/", (req, res) => {
+  let conn = makeConnection(req.session.salesforce);
+  conn.request()
 })
 
 app.get(config.routes.auth.callback, (req, res) => {
