@@ -36,16 +36,12 @@ exports.storeResponse = async (req, source) => {
       version: process.env.API_VERSION
     }
 
-    console.log(sf_object.authCredentials)
-
     let conn = new jsforce.Connection(sf_object.authCredentials)
 
     sf_object.authResponse = {
       accessToken: conn.accessToken,
       instanceUrl: conn.instanceUrl
     }
-
-    console.log(sf_object)
 
     return sf_object
 
@@ -57,8 +53,6 @@ exports.storeResponse = async (req, source) => {
       oauth2: oauth2
     }
 
-    console.log(sf_object.authCredentials)
-
     let conn = new jsforce.Connection(sf_object.authCredentials)
 
     conn.authorize(req.query.code, (err, userInfo) => {
@@ -69,8 +63,6 @@ exports.storeResponse = async (req, source) => {
           accessToken: conn.accessToken,
           instanceUrl: conn.instanceUrl
         }
-
-        console.log(sf_object)
 
         return sf_object
 

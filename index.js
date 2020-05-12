@@ -36,46 +36,46 @@ app
     saveUninitialized: true
   }))
 
-  app.use(function (req, res, next) {
+app.use(function (req, res, next) {
 
-    if (req.session.salesforce === {} &&
-        req.path !== config.routes.auth.callback) {
+  if (!req.session.salesforce &&
+      req.path !== config.routes.auth.callback) {
 
-      console.log("No Salesforce session. Initializing...")
-      req.session.salesforce = {}
+    console.log("No Salesforce session. Initializing...")
 
-      try {
+    req.session.salesforce = {}
 
-        if (req.get("source") === "session") {
+    try {
 
-          auth.storeResponse(req, "session")
-            .then(sfdc => {
-              req.session.salesforce = sfdc
-            })
-            .catch(error => {
-              console.error(error)
-            })
+      if (req.get("source") === "session") {
 
-          next()
+        auth.storeResponse(req, "session")
+          .then(sfdc => {
+            req.session.salesforce = sfdc
+          })
+          .catch(error => {
+            console.error(error)
+          })
 
+        next()
 
-        } else {
-          res.redirect(oauth2.getAuthorizationUrl())
-        }
-
-      } catch (err) {
-
-        // Return error and delete staging folder.
-        console.error(err)
-
+      } else {
+        res.redirect(oauth2.getAuthorizationUrl())
       }
 
-    } else {
-      console.log("Salesforce session found on session:", req.sessionID)
-      next()
+    } catch (err) {
+
+      // Return error and delete staging folder.
+      console.error(err)
+
     }
 
-  })
+  } else {
+    console.log("Salesforce session found on session:", req.sessionID)
+    next()
+  }
+
+})
 
 app
   .listen(process.env.PORT || 8080, () => {
@@ -102,39 +102,7 @@ app.all(config.routes.all, (req, res, next) => {
   next()
 })
 
-/*
-
-app.all(config.routes.require_auth, (req, res, next) => {
-
-  if (req.get("source") === "internal") {
-
-    const session_object = {
-      serverUrl: req.get("server_url"),
-      sessionId: req.get("session_id"),
-      version: "48.0"
-    }
-
-    sf.connection = new jsforce.Connection(session_object)
-
-    next()
-
-  } else if (req.url !== config.routes.auth.request &&
-      req.path !== config.routes.auth.callback &&
-      !sf.connection) {
-
-    sf.on_connect_redirect = req.url
-    res.redirect(config.routes.auth.request)
-
-  } else {
-    next()
-  }
-
-})
-
-*/
-
 app.get("/", (req, res) => {
-  console.log(req.session)
   res.status(200).json({
     message: "Authentication Successful.",
     sessionId: req.sessionID
