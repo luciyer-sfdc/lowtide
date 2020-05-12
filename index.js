@@ -118,22 +118,20 @@ app.get("/", (req, res) => {
 })
 
 app.get("/test/", (req, res) => {
-  //let conn = makeConnection(req.session.salesforce);
+  //let conn = auth.getConnection(req.session);
 })
 
 app.get(config.routes.auth.callback, middleware(async(req, res) => {
 
-  req.session.salesforce = auth.storeResponse(req, "oauth2")
-  let sfdc = await auth.storeResponse(req, "oauth2")
-
-  console.log(req.session.salesforce)
-  console.log(sfdc)
-
-  if (sfdc) {
-    res.redirect("/")
-  } else {
-    res.status(500).json({ error: "Auth failed." })
-  }
+  auth.storeResponse(req, "oauth2")
+    .then(sfdc => {
+      req.session.salesforce = sfdc
+      res.redirect("/")
+    })
+    .catch(error => {
+      console.error(error)
+      res.status(500).json({ error: "Auth failed." })
+    })
 
 }))
 

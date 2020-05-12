@@ -9,14 +9,14 @@ const oauth2 = new jsforce.OAuth2({
   redirectUri: process.env.BASE_URL + config.routes.auth.callback
 })
 
-exports.makeConnection = (salesforce_session) => {
+exports.getConnection = (session) => {
   return new jsforce.Connection({
     accessToken: session.salesforce.authResponse.accessToken,
     instanceUrl: session.salesforce.authResponse.instanceUrl
   })
 }
 
-exports.storeResponse = (req, source) => {
+exports.storeResponse = async (req, source) => {
 
   const sf_object = {
     type: source,
@@ -83,7 +83,5 @@ exports.storeResponse = (req, source) => {
     console.error("Supported auth methods: Session or Oauth2.")
     return null
   }
-
-
 
 }
