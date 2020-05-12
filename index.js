@@ -121,44 +121,21 @@ app.get("/test/", (req, res) => {
   //let conn = makeConnection(req.session.salesforce);
 })
 
-app.get(config.routes.auth.callback, (req, res) => {
+app.get(config.routes.auth.callback, middleware(async(req, res) => {
 
   req.session.salesforce = auth.storeResponse(req, "oauth2")
+  let sfdc = await auth.storeResponse(req, "oauth2")
 
-  if (req.session.salesforce) {
+  console.log(req.session.salesforce)
+  console.log(sfdc)
+
+  if (sfdc) {
     res.redirect("/")
   } else {
     res.status(500).json({ error: "Auth failed." })
   }
 
-  /*
-  const conn = new jsforce.Connection({ oauth2 : oauth2 })
-
-  conn.authorize(req.query.code, function(err, userInfo) {
-
-    if (!err) {
-
-      util.logAuth(conn, userInfo)
-
-      req.session.salesforce = {}
-      req.session.salesforce.source = "oauth2"
-
-      req.session.salesforce.authInfo = {
-        accessToken: conn.accessToken,
-        serverUrl: conn.instanceUrl
-      }
-
-      res.redirect("/")
-
-    } else {
-      console.error(err)
-
-    }
-
-  })
-  */
-
-})
+}))
 
 /*
 
