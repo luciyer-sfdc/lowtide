@@ -20,10 +20,10 @@ exports.storeResponse = (req, source) => {
 
   const sf_object = {
     type: source,
-    authCredentials: {},
-    authResponse: {},
     opened: new Date(),
-    rest: process.env.API_ENDPOINT
+    rest: process.env.API_ENDPOINT,
+    authCredentials: {},
+    authResponse: {}
   }
 
   if (source === "session") {
@@ -41,6 +41,8 @@ exports.storeResponse = (req, source) => {
       instanceUrl: conn.instanceUrl
     }
 
+    return sf_object
+
   } else if (source === "oauth2") {
 
     sf_object.authCredentials = {
@@ -57,7 +59,9 @@ exports.storeResponse = (req, source) => {
           accessToken: conn.accessToken,
           instanceUrl: conn.instanceUrl
         }
-        
+
+        return sf_object
+
       } else {
         console.error(err)
       }
@@ -67,6 +71,6 @@ exports.storeResponse = (req, source) => {
     console.error("Supported auth methods: Session or Oauth2.")
   }
 
-  return sf_object
+  return null
 
 }

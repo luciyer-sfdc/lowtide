@@ -52,6 +52,7 @@ app
           req.session.salesforce = auth.storeResponse(req, "session")
           next()
 
+
         } else {
           res.redirect(oauth2.getAuthorizationUrl())
         }
@@ -126,7 +127,7 @@ app.get(config.routes.auth.callback, (req, res) => {
 
   req.session.salesforce = auth.storeResponse(req, "oauth2")
 
-  if (req.session.salesforce.authResponse !== {}) {
+  if (req.session.salesforce !== null) {
     res.redirect("/")
   } else {
     res.status(500).json({ error: "Auth failed." })
