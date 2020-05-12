@@ -28,11 +28,15 @@ exports.storeResponse = (req, source) => {
 
   if (source === "session") {
 
+    console.log("Authorizing with Salesforce Session.")
+
     sf_object.authCredentials = {
       serverUrl: req.get("server_url"),
       sessionId: req.get("session_id"),
       version: process.env.API_VERSION
     }
+
+    console.log(sf_object.authCredentials)
 
     let conn = new jsforce.Connection(sf_object.authCredentials)
 
@@ -41,13 +45,19 @@ exports.storeResponse = (req, source) => {
       instanceUrl: conn.instanceUrl
     }
 
+    console.log(sf_object)
+
     return sf_object
 
   } else if (source === "oauth2") {
 
+    console.log("Authorizing with Oauth2.")
+
     sf_object.authCredentials = {
       oauth2: oauth2
     }
+
+    console.log(sf_object.authCredentials)
 
     let conn = new jsforce.Connection(sf_object.authCredentials)
 
@@ -60,6 +70,8 @@ exports.storeResponse = (req, source) => {
           instanceUrl: conn.instanceUrl
         }
 
+        console.log(sf_object)
+
         return sf_object
 
       } else {
@@ -69,8 +81,9 @@ exports.storeResponse = (req, source) => {
 
   } else {
     console.error("Supported auth methods: Session or Oauth2.")
+    return null
   }
 
-  return null
+
 
 }
