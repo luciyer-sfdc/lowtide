@@ -9,6 +9,10 @@ const oauth2 = new jsforce.OAuth2({
   redirectUri: process.env.BASE_URL + config.routes.auth.callback
 })
 
+exports.getAuthUrl = () => {
+  return oauth2.getAuthorizationUrl()
+}
+
 exports.getConnection = (session) => {
   return new jsforce.Connection({
     accessToken: session.salesforce.authResponse.accessToken,

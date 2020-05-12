@@ -32,6 +32,7 @@ app
 
 app.use(function (req, res, next) {
 
+  console.log("sf", req.session.salesforce)
   console.log("path", req.path)
   console.log("cb", config.routes.auth.callback)
 
