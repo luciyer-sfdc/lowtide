@@ -34,7 +34,7 @@ exports.storeResponse = (req, source) => {
       version: process.env.API_VERSION
     }
 
-    const conn = new jsforce.Connection(sf_object.authCredentials)
+    let conn = new jsforce.Connection(sf_object.authCredentials)
 
     sf_object.authResponse = {
       accessToken: conn.accessToken,
@@ -49,7 +49,7 @@ exports.storeResponse = (req, source) => {
       oauth2: oauth2
     }
 
-    const conn = new jsforce.Connection(sf_object.authCredentials)
+    let conn = new jsforce.Connection(sf_object.authCredentials)
 
     conn.authorize(req.query.code, (err, userInfo) => {
 

@@ -43,8 +43,6 @@ app
 
       console.log("No Salesforce session. Initializing...")
 
-      req.session.salesforce = {}
-
       try {
 
         if (req.get("source") === "session") {
@@ -127,7 +125,7 @@ app.get(config.routes.auth.callback, (req, res) => {
 
   req.session.salesforce = auth.storeResponse(req, "oauth2")
 
-  if (req.session.salesforce !== null) {
+  if (req.session.salesforce) {
     res.redirect("/")
   } else {
     res.status(500).json({ error: "Auth failed." })
