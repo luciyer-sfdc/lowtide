@@ -50,24 +50,6 @@ app
         if (req.get("source") === "session") {
 
           req.session.salesforce = auth.storeResponse(req, "session")
-
-          /*
-          req.session.salesforce.source = "internal"
-          req.session.salesforce.authResponse = {}
-
-          req.session.salesforce.authCredentials = {
-            serverUrl: req.get("server_url"),
-            sessionId: req.get("session_id"),
-            version: process.env.API_VERSION
-          }
-
-          const conn = new jsforce.Connection(req.session.salesforce.authCredentials)
-
-
-          req.session.salesforce.authResponse.accessToken = conn.accessToken
-          req.session.salesforce.authResponse.instanceUrl = conn.instanceUrl
-          */
-          
           next()
 
         } else {
@@ -137,12 +119,20 @@ app.get("/", (req, res) => {
 })
 
 app.get("/test/", (req, res) => {
-  let conn = makeConnection(req.session.salesforce);
-  conn.request()
+  //let conn = makeConnection(req.session.salesforce);
 })
 
 app.get(config.routes.auth.callback, (req, res) => {
 
+  req.session.salesforce = auth.storeResponse(req, "oauth2")
+
+  if (req.session.salesforce.authResponse !== {}) {
+    res.redirect("/")
+  } else {
+    res.status(500).json({ error: "Auth failed." })
+  }
+
+  /*
   const conn = new jsforce.Connection({ oauth2 : oauth2 })
 
   conn.authorize(req.query.code, function(err, userInfo) {
@@ -163,10 +153,11 @@ app.get(config.routes.auth.callback, (req, res) => {
 
     } else {
       console.error(err)
-      res.status(500).json({ error: err })
+
     }
 
   })
+  */
 
 })
 

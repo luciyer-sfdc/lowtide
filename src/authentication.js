@@ -27,27 +27,46 @@ exports.storeResponse = (req, source) => {
   }
 
   if (source === "session") {
+
     sf_object.authCredentials = {
       serverUrl: req.get("server_url"),
       sessionId: req.get("session_id"),
       version: process.env.API_VERSION
     }
+
+    const conn = new jsforce.Connection(sf_object.authCredentials)
+
+    sf_object.authResponse = {
+      accessToken: conn.accessToken,
+      instanceUrl: conn.instanceUrl
+    }
+
   } else if (source === "oauth2") {
+
     sf_object.authCredentials = {
       oauth2: oauth2
     }
+
+    const conn = new jsforce.Connection(sf_object.authCredentials)
+
+    conn.authorize(req.query.code, (err, userInfo) => {
+
+      if (!err) {
+
+        sf_object.authResponse = {
+          accessToken: conn.accessToken,
+          instanceUrl: conn.instanceUrl
+        }
+        
+      } else {
+        console.error(err)
+      }
+    })
+
   } else {
     console.error("Supported auth methods: Session or Oauth2.")
   }
 
-  const conn = new jsforce.Connection(sf_object.authCredentials)
-
-  sf_object.authResponse = {
-    accessToken: conn.accessToken,
-    instanceUrl: conn.instanceUrl
-  }
-
   return sf_object
-
 
 }
