@@ -38,7 +38,7 @@ app
 
   app.use(function (req, res, next) {
 
-    if (req.session.salesforce !== {} &&
+    if (req.session.salesforce === {} &&
         req.path !== config.routes.auth.callback) {
 
       console.log("No Salesforce session. Initializing...")
@@ -48,7 +48,14 @@ app
 
         if (req.get("source") === "session") {
 
-          req.session.salesforce = auth.storeResponse(req, "session")
+          auth.storeResponse(req, "session")
+            .then(sfdc => {
+              req.session.salesforce = sfdc
+            })
+            .catch(error => {
+              console.error(error)
+            })
+
           next()
 
 
@@ -71,8 +78,24 @@ app
   })
 
 app
-  .listen(process.env.PORT || 8080, () =>
-    util.logStartup(config, oauth2))
+  .listen(process.env.PORT || 8080, () => {
+    util.logStartup(config, oauth2)
+  })
+
+
+app.get(config.routes.auth.callback, middleware(async(req, res) => {
+
+  auth.storeResponse(req, "oauth2")
+    .then(sfdc => {
+      req.session.salesforce = sfdc
+      res.redirect("/")
+    })
+    .catch(error => {
+      console.error(error)
+      res.status(500).json({ error: "Auth failed." })
+    })
+
+}))
 
 app.all(config.routes.all, (req, res, next) => {
   console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
@@ -122,19 +145,7 @@ app.get("/test/", (req, res) => {
   //let conn = auth.getConnection(req.session);
 })
 
-app.get(config.routes.auth.callback, middleware(async(req, res) => {
 
-  auth.storeResponse(req, "oauth2")
-    .then(sfdc => {
-      req.session.salesforce = sfdc
-      res.redirect("/")
-    })
-    .catch(error => {
-      console.error(error)
-      res.status(500).json({ error: "Auth failed." })
-    })
-
-}))
 
 /*
 
