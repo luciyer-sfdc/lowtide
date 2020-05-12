@@ -16,12 +16,6 @@ const lowtide = require("./src"),
       repository = lowtide.repository,
       deploy = lowtide.deploy
 
-const oauth2 = new jsforce.OAuth2({
-  clientId: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
-  redirectUri: process.env.BASE_URL + config.routes.auth.callback
-})
-
 const app = express()
 
 app
@@ -38,7 +32,10 @@ app
 
 app.use(function (req, res, next) {
 
-  if (req.session.salesforce === {} &&
+  console.log("path", req.path)
+  console.log("cb", config.routes.auth.callback)
+
+  if (!req.session.salesforce &&
       req.path !== config.routes.auth.callback) {
 
     console.log("No Salesforce session. Initializing...")
@@ -60,7 +57,7 @@ app.use(function (req, res, next) {
         next()
 
       } else {
-        res.redirect(oauth2.getAuthorizationUrl())
+        res.redirect(auth.getAuthUrl())
       }
 
     } catch (err) {
@@ -79,7 +76,7 @@ app.use(function (req, res, next) {
 
 app
   .listen(process.env.PORT || 8080, () => {
-    util.logStartup(config, oauth2)
+    console.log("Server Up.")
   })
 
 
