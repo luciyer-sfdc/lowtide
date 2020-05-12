@@ -50,12 +50,11 @@ app.use(function (req, res, next) {
         auth.storeResponse(req, "session")
           .then(sfdc => {
             req.session.salesforce = sfdc
+            next()
           })
           .catch(error => {
             console.error(error)
           })
-
-        next()
 
       } else {
         res.redirect(auth.getAuthUrl())
@@ -95,12 +94,15 @@ app.get(config.routes.auth.callback, middleware(async(req, res) => {
 
 }))
 
+/*
 app.all(config.routes.all, (req, res, next) => {
   console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
   next()
 })
+*/
 
 app.get("/", (req, res) => {
+  console.log(req.session.salesforce)
   res.status(200).json({
     message: "Authentication Successful.",
     sessionId: req.sessionID
