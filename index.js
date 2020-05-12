@@ -38,10 +38,11 @@ app
 
   app.use(function (req, res, next) {
 
-    if (!req.session.salesforce &&
+    if (req.session.salesforce !== {} &&
         req.path !== config.routes.auth.callback) {
 
       console.log("No Salesforce session. Initializing...")
+      req.session.salesforce = {}
 
       try {
 
