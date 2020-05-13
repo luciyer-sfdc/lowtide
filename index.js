@@ -49,6 +49,7 @@ app.use(function (req, res, next) {
 
         auth.storeResponse(req, "session")
           .then(sfdc => {
+            console.log(sfdc)
             req.session.salesforce = sfdc
             next()
           })
