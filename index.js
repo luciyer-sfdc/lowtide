@@ -47,7 +47,7 @@ app.use(function (req, res, next) {
 
       if (req.get("source") === "session") {
 
-        auth.storeResponse(req, "session")
+        auth.storeInternal(req)
           .then(sfdc => {
             console.log(sfdc)
             req.session.salesforce = sfdc
@@ -83,15 +83,39 @@ app
 
 app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
 
-  auth.storeResponse(req, "oauth2")
-    .then(sfdc => {
-      console.log(sfdc)
-      req.session.salesforce = sfdc
-    })
-    .catch(error => {
-      console.error(error)
-      res.status(500).json({ error: "Auth failed." })
-    })
+  console.log("Authorizing with Oauth2.")
+
+  const sf_object = {
+    type: "oauth2",
+    opened: new Date(),
+    rest: process.env.API_ENDPOINT,
+    authCredentials: {},
+    authResponse: {}
+  }
+
+  sf_object.authCredentials = auth.getOauthObject()
+
+  let conn = new jsforce.Connection(sf_object.authCredentials)
+
+  conn.authorize(req.query.code, (err, userInfo) => {
+
+    if (!err) {
+
+      sf_object.authResponse = {
+        accessToken: conn.accessToken,
+        instanceUrl: conn.instanceUrl
+      }
+
+      req.session.salesforce = sf_object
+
+      res.redirect("/")
+
+    } else {
+      console.error(err)
+      res.status(500).json({ error: err })
+    }
+
+  })
 
 }))
 
