@@ -80,12 +80,12 @@ app
   })
 
 
-app.get(config.routes.auth.callback, middleware(async(req, res) => {
+app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
 
   auth.storeResponse(req, "oauth2")
     .then(sfdc => {
       req.session.salesforce = sfdc
-      res.redirect("/")
+      next()
     })
     .catch(error => {
       console.error(error)
