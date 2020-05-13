@@ -38,6 +38,10 @@ app.use(function (req, res, next) {
     console.log("No Salesforce session. Initializing...")
 
     req.session.salesforce = {}
+    
+    repository.createContainerFolder(req.sessionID)
+      .then(console.log("Created", req.sessionID))
+      .catch(console.error)
 
     try {
 
