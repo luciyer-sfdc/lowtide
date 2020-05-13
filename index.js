@@ -84,8 +84,8 @@ app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
 
   auth.storeResponse(req, "oauth2")
     .then(sfdc => {
+      console.log(sfdc)
       req.session.salesforce = sfdc
-      next()
     })
     .catch(error => {
       console.error(error)
