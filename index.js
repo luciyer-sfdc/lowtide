@@ -32,10 +32,6 @@ app
 
 app.use(function (req, res, next) {
 
-  console.log("sf", req.session.salesforce)
-  console.log("path", req.path)
-  console.log("cb", config.routes.auth.callback)
-
   if (!req.session.salesforce &&
       req.path !== config.routes.auth.callback) {
 
@@ -49,7 +45,7 @@ app.use(function (req, res, next) {
 
         auth.storeInternal(req)
           .then(sfdc => {
-            console.log(sfdc)
+            console.log("Routing request.")
             req.session.salesforce = sfdc
             next()
           })
@@ -58,6 +54,7 @@ app.use(function (req, res, next) {
           })
 
       } else {
+        console.log("Routing to Salesforce Oauth URL.")
         res.redirect(auth.getAuthUrl())
       }
 
@@ -69,7 +66,8 @@ app.use(function (req, res, next) {
     }
 
   } else {
-    console.log("Salesforce session found on session:", req.sessionID)
+    console.log("Salesforce found on session:", req.sessionID)
+    console.log("Routing request.")
     next()
   }
 
@@ -108,6 +106,7 @@ app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
 
       req.session.salesforce = sf_object
 
+      console.log("Redirecting to Homepage.")
       res.redirect("/")
 
     } else {
@@ -119,15 +118,14 @@ app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
 
 }))
 
-/*
+
 app.all(config.routes.all, (req, res, next) => {
   console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
   next()
 })
-*/
+
 
 app.get("/", (req, res) => {
-  console.log(req.session.salesforce)
   res.status(200).json({
     message: "Authentication Successful.",
     sessionId: req.sessionID
@@ -135,7 +133,8 @@ app.get("/", (req, res) => {
 })
 
 app.get("/test/", (req, res) => {
-  //let conn = auth.getConnection(req.session);
+  console.log(req.session.salesforce)
+  res.sendStatus(200)
 })
 
 
