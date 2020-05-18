@@ -1,9 +1,3 @@
-exports.logStartup = (config, oauth2) => {
-  console.log("### API ROUTES ###\n", config.routes)
-  console.log("### OAUTH ###\n", oauth2)
-  console.log("\n\nLISTENING...\n\n")
-}
-
 exports.timestamp = () => {
   return new Date().toLocaleTimeString()
 }
@@ -16,5 +10,9 @@ exports.logAuth = (conn, userInfo) => {
 }
 
 exports.scheduleDelete = (date, folder_id) => {
+
+}
+
+exports.stayAwake = () => {
 
 }

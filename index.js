@@ -26,6 +26,7 @@ app
       return uuidv4()
     },
     secret: "some secret here stored in process.env",
+    cookie: { maxAge: (60 * 60 * 1000) },
     resave: false,
     saveUninitialized: true
   }))
@@ -71,7 +72,8 @@ app.use(function (req, res, next) {
 
   } else {
     console.log("Salesforce found on session:", req.sessionID)
-    console.log("SF Details:", req.session.salesforce)
+    console.log("SF Details:", req.session.salesforce.authResponse)
+    console.log("Cookie:", req.session.cookie)
     console.log("Routing request.")
     next()
   }
