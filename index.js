@@ -38,7 +38,7 @@ app.use(function (req, res, next) {
     console.log("No Salesforce session. Initializing...")
 
     req.session.salesforce = {}
-    
+
     repository.createContainerFolder(req.sessionID)
       .then(console.log("Created", req.sessionID))
       .catch(console.error)
@@ -71,6 +71,7 @@ app.use(function (req, res, next) {
 
   } else {
     console.log("Salesforce found on session:", req.sessionID)
+    console.log("SF Details:", req.session.salesforce)
     console.log("Routing request.")
     next()
   }
