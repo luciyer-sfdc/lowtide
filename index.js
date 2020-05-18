@@ -5,6 +5,7 @@ const shortid = require("shortid")
 const jsforce = require("jsforce")
 const express = require("express")
 const session = require("express-session")
+const MongoStore = require("connect-mongo")(session)
 const bodyparser = require("body-parser")
 const middleware = require('express-async-handler')
 
@@ -15,6 +16,8 @@ const lowtide = require("./src"),
       package = lowtide.package,
       repository = lowtide.repository,
       deploy = lowtide.deploy
+
+const mongo_connection = process.env.MONGODB_URI || "mongodb://localhost/";
 
 const app = express()
 
@@ -27,6 +30,9 @@ app
     },
     secret: "some secret here stored in process.env",
     cookie: { maxAge: (60 * 60 * 1000) },
+    store: new MongoStore({
+      url: mongo_connection
+    }),
     resave: false,
     saveUninitialized: true
   }))
@@ -41,7 +47,7 @@ app.use(function (req, res, next) {
     req.session.salesforce = {}
 
     repository.createContainerFolder(req.sessionID)
-      .then(console.log("Created", req.sessionID))
+      .then(console.log("Created Folder:", req.sessionID))
       .catch(console.error)
 
     try {
@@ -64,10 +70,7 @@ app.use(function (req, res, next) {
       }
 
     } catch (err) {
-
-      // Return error and delete staging folder.
       console.error(err)
-
     }
 
   } else {
