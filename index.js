@@ -46,10 +46,6 @@ app.use(function (req, res, next) {
 
     req.session.salesforce = {}
 
-    repository.createContainerFolder(req.sessionID)
-      .then(console.log("Created Folder:", req.sessionID))
-      .catch(console.error)
-
     try {
 
       if (req.get("source") === "session") {
@@ -142,34 +138,39 @@ app.get("/", (req, res) => {
   })
 })
 
-app.get("/test/", (req, res) => {
-  console.log(req.session.salesforce)
-  res.sendStatus(200)
+app.get("/test/", (req, res, next) => {
+
+  auth.testAsync()
+    .then((message) => {
+      res.send(message)
+    })
+    .catch(console.error)
+
 })
 
 
 
-/*
-
 app.get(config.routes.auth.revoke, (req, res) => {
 
-  if (!sf.connection){
-    res.status(500).json({ error: "No connection found."})
-  } else {
-    sf.connection.logout(err => {
-      if (err) {
-        console.error(err);
-        res.status(500).json({ error: "Logout failed."})
-      }
-      else {
-        sf.connection = null
-        console.log("Logout successful.");
-        res.status(200).json({ message: "Logout successful."})
-      }
+  const conn = auth.getConnection(req.session)
+
+  if (req.session.salesforce.type === "oauth2") {
+    conn.logoutByOauth2(() => {
+      req.session.destroy(() => {
+        res.status(200).json({ message: "Logout via oauth2 successful." })
+      })
+    })
+  } else if (req.session.salesforce.type === "session") {
+    conn.logout(() => {
+      req.session.destroy(() => {
+        res.status(200).json({ message: "Logout via oauth2 successful." })
+      })
     })
   }
 
 })
+
+/*
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "homepage here" })

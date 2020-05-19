@@ -16,3 +16,7 @@ exports.scheduleDelete = (date, folder_id) => {
 exports.stayAwake = () => {
 
 }
+
+exports.clearStaging = () => {
+  
+}

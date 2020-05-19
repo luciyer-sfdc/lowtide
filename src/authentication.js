@@ -24,6 +24,12 @@ exports.getConnection = (session) => {
   })
 }
 
+exports.testAsync = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve("done!"), 5000)
+  });
+}
+
 exports.storeInternal = async (req) => {
 
   console.log("Authorizing with Salesforce Session.")
