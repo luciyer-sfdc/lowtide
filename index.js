@@ -144,7 +144,7 @@ app.get(config.routes.auth.revoke, (req, res) => {
   const conn = auth.getConnection(req.session)
 
   if (req.session.salesforce.type === "oauth2") {
-    conn.logoutByOauth2(() => {
+    conn.logoutByOAuth2(() => {
       req.session.destroy(() => {
         res.status(200).json({ message: "Logout via oauth2 successful." })
       })
