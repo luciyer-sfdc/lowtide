@@ -156,11 +156,16 @@ app.get(config.routes.templates.exist, (req, res) => {
 
   conn.request(process.env.API_ENDPOINT + "templates")
     .then(result => {
-      res.setatus(200).json(result)
+      res.status(200).json(result)
     })
     .catch(error => {
       console.error(error)
       res.sendStatus(500)
     })
+
+})
+
+app.get(config.routes.templates.exist, (req, res) => {
+
 
 })
