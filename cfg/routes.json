@@ -7,7 +7,7 @@
     "revoke" : "/api/auth/revoke"
   },
   "templates" : {
-    "exist" : "/api/templates/exist",
-    "available" : "/api/templates/available"
+    "existing" : "/api/templates/org",
+    "available" : "/api/templates/repository"
   }
 }

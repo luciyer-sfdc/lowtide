@@ -1,13 +1,15 @@
 require("dotenv").config()
 
-const { v4: uuidv4 } = require("uuid")
-const shortid = require("shortid")
+const path = require("path")
 const jsforce = require("jsforce")
+
 const express = require("express")
 const session = require("express-session")
-const MongoStore = require("connect-mongo")(session)
 const bodyparser = require("body-parser")
-const middleware = require('express-async-handler')
+const { v4: uuidv4 } = require("uuid")
+
+const mongoose = require("mongoose")
+const MongoStore = require("connect-mongo")(session)
 
 const lowtide = require("./src"),
       auth = lowtide.auth,
@@ -17,7 +19,11 @@ const lowtide = require("./src"),
       repository = lowtide.repository,
       deploy = lowtide.deploy
 
-const mongo_connection = process.env.MONGODB_URI || "mongodb://localhost/";
+const db_uri = process.env.MONGODB_URI || "mongodb://localhost/dev"
+
+mongoose.connect(db_uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => { console.log("Connected to MongoDB.") })
+  .catch(console.error)
 
 const app = express()
 
@@ -25,14 +31,10 @@ app
   .use(bodyparser.json())
   .use(express.urlencoded({ extended: true }))
   .use(session({
-    genid: (req) => {
-      return uuidv4()
-    },
+    genid: (req) => { return uuidv4() },
     secret: "some secret here stored in process.env",
     cookie: { maxAge: (60 * 60 * 1000) },
-    store: new MongoStore({
-      url: mongo_connection
-    }),
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
     resave: false,
     saveUninitialized: true
   }))
@@ -91,7 +93,7 @@ app
   })
 
 
-app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
+app.get(config.routes.auth.callback, (req, res, next) => {
 
   console.log("Authorizing with Oauth2.")
 
@@ -128,7 +130,7 @@ app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
 
   })
 
-}))
+})
 
 app.get(config.routes.auth.revoke, (req, res) => {
 
@@ -150,7 +152,7 @@ app.get(config.routes.auth.revoke, (req, res) => {
 
 })
 
-app.get(config.routes.templates.exist, (req, res) => {
+app.get(config.routes.templates.existing, (req, res) => {
 
   const conn = auth.getConnection(req.session)
 
@@ -165,7 +167,24 @@ app.get(config.routes.templates.exist, (req, res) => {
 
 })
 
-app.get(config.routes.templates.exist, (req, res) => {
+app.get(config.routes.templates.available, (req, res) => {
+
+  const archive = "./templates/CSV_Template.zip"
+  const conn = auth.getConnection(req.session)
+
+  conn.metadata.pollTimeout = 60*1000;
+
+  conn.metadata.deploy(archive, {})
+    .complete(true, (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json(err)
+      } else {
+        console.log("Result", result)
+        console.log("Errors", result.details.componentFailures)
+        res.status(200).json(result)
+      }
+    })
 
 
 })
