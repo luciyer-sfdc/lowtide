@@ -70,6 +70,7 @@ app.use(function (req, res, next) {
     }
 
   } else {
+
     console.log("Salesforce found on session:", req.sessionID)
     console.log("SF Details:", req.session.salesforce.authResponse)
     console.log("Cookie:", req.session.cookie)
@@ -82,6 +83,11 @@ app.use(function (req, res, next) {
 app
   .listen(process.env.PORT || 8080, () => {
     console.log("Server Up.")
+  })
+
+  app.all(config.routes.all, (req, res, next) => {
+    console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
+    next()
   })
 
 
@@ -124,21 +130,6 @@ app.get(config.routes.auth.callback, middleware(async(req, res, next) => {
 
 }))
 
-
-app.all(config.routes.all, (req, res, next) => {
-  console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
-  next()
-})
-
-
-app.get("/", (req, res) => {
-  res.status(200).json({
-    message: "Authentication Successful.",
-    sessionId: req.sessionID
-  })
-})
-
-
 app.get(config.routes.auth.revoke, (req, res) => {
 
   const conn = auth.getConnection(req.session)
@@ -156,5 +147,20 @@ app.get(config.routes.auth.revoke, (req, res) => {
       })
     })
   }
+
+})
+
+app.get(config.routes.templates.exist, (req, res) => {
+
+  const conn = auth.getConnection(req.session)
+
+  conn.request(process.env.API_ENDPOINT + "templates")
+    .then(result => {
+      res.setatus(200).json(result)
+    })
+    .catch(error => {
+      console.error(error)
+      res.sendStatus(500)
+    })
 
 })
