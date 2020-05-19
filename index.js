@@ -39,7 +39,7 @@ app
 
 app.use(function (req, res, next) {
 
-  if ( (!req.session.salesforce || req.session.salesforce === undefined) &&
+  if ( (!req.session.salesforce || req.session.salesforce.authResponse === undefined) &&
       req.path !== config.routes.auth.callback) {
 
     console.log("No Salesforce session. Initializing...")
