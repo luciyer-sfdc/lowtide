@@ -9,5 +9,6 @@
   "templates" : {
     "existing" : "/api/templates/org",
     "available" : "/api/templates/repository"
+    "deploy" : "/api/templates/deploy"
   }
 }

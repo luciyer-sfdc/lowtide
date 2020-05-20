@@ -39,6 +39,7 @@ app
     saveUninitialized: true
   }))
 
+/*
 app.use(function (req, res, next) {
 
   if ( (!req.session.salesforce || req.session.salesforce.authResponse === undefined) &&
@@ -82,15 +83,17 @@ app.use(function (req, res, next) {
 
 })
 
+*/
+
 app
   .listen(process.env.PORT || 8080, () => {
     console.log("Server Up.")
   })
 
-  app.all(config.routes.all, (req, res, next) => {
-    console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
-    next()
-  })
+app.all(config.routes.all, (req, res, next) => {
+  console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
+  next()
+})
 
 
 app.get(config.routes.auth.callback, (req, res, next) => {
@@ -169,22 +172,8 @@ app.get(config.routes.templates.existing, (req, res) => {
 
 app.get(config.routes.templates.available, (req, res) => {
 
-  const archive = "./templates/CSV_Template.zip"
   const conn = auth.getConnection(req.session)
 
-  conn.metadata.pollTimeout = 60*1000;
-
-  conn.metadata.deploy(archive, {})
-    .complete(true, (err, result) => {
-      if (err) {
-        console.error(err)
-        res.status(500).json(err)
-      } else {
-        console.log("Result", result)
-        console.log("Errors", result.details.componentFailures)
-        res.status(200).json(result)
-      }
-    })
-
+  deploy.fromRepository(conn, ["CSV_Template"])
 
 })

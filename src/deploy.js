@@ -1,6 +1,10 @@
+require("dotenv").config()
+
 const fs = require("fs")
 const path = require("path")
 const archiver = require("archiver")
+
+const package = require("./package.js")
 
 const DEFAULT_DEPLOY_OPTIONS = {
   allowMissingFiles: false,
@@ -13,16 +17,39 @@ const DEFAULT_DEPLOY_OPTIONS = {
   singlePackage: false
 }
 
-exports.fromDirectory = (conn, packageDirectoryPath) => {
+exports.fromRepository = (conn, template_list) => {
 
-  const dirname = path.basename(packageDirectoryPath)
-  const cwd = path.join(packageDirectoryPath, '..')
-  const archive = archiver('zip')
+  const archive = archiver("zip", {})
 
-  archive.glob(dirname + '/**', { cwd: cwd })
+  archive.on("error", (err) => {
+    throw err;
+  })
+
+  const cwd = path.join(__dirname, '..')
+  const staging_directory = cwd + process.env.STAGING_DIR
+  const template_directory = cwd + process.env.TEMPLATE_DIR
+
+  const output = fs.createWriteStream(staging_directory + "package.zip")
+
+  output.on("close", () => {
+    console.log(archive.pointer() + ' total bytes.');
+  })
+
+  archive.pipe(output);
+
+  template_list.forEach((template) => {
+      archive.directory(
+        template_directory + template,
+        "waveTemplates/" + template
+      );
+  })
+
+  archive.append(package.generateXML(), { name: "package.xml" });
+
   archive.finalize()
 
-  conn.metadata.pollTimeout = 60*1000;
+
+  conn.metadata.pollTimeout = 90*1000;
 
   conn.metadata.deploy(archive, {})
     .complete(true, (err, result) => {
@@ -32,5 +59,5 @@ exports.fromDirectory = (conn, packageDirectoryPath) => {
         console.log("Errors", result.details.componentFailures)
       }
     })
-
+  
 }
