@@ -19,35 +19,25 @@ const DEFAULT_DEPLOY_OPTIONS = {
 
 exports.fromRepository = (conn, template_list) => {
 
-  const archive = archiver("zip", {})
+  const archive = archiver("zip")
+  const cwd = path.join(__dirname, '..')
+  const staging_directory = cwd + process.env.STAGING_DIR
+  const template_directory = cwd + process.env.TEMPLATE_DIR
 
   archive.on("error", (err) => {
     throw err;
   })
 
-  const cwd = path.join(__dirname, '..')
-  const staging_directory = cwd + process.env.STAGING_DIR
-  const template_directory = cwd + process.env.TEMPLATE_DIR
-
-  const output = fs.createWriteStream(staging_directory + "package.zip")
-
-  output.on("close", () => {
-    console.log(archive.pointer() + ' total bytes.');
-  })
-
-  archive.pipe(output);
-
   template_list.forEach((template) => {
       archive.directory(
         template_directory + template,
         "waveTemplates/" + template
-      );
+      )
   })
 
   archive.append(package.generateXML(), { name: "package.xml" });
 
   archive.finalize()
-
 
   conn.metadata.pollTimeout = 90*1000;
 
@@ -59,5 +49,5 @@ exports.fromRepository = (conn, template_list) => {
         console.log("Errors", result.details.componentFailures)
       }
     })
-  
+
 }
