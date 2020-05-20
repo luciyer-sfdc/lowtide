@@ -39,7 +39,7 @@ app
     saveUninitialized: true
   }))
 
-/*
+
 app.use(function (req, res, next) {
 
   if ( (!req.session.salesforce || req.session.salesforce.authResponse === undefined) &&
@@ -82,8 +82,6 @@ app.use(function (req, res, next) {
   }
 
 })
-
-*/
 
 app
   .listen(process.env.PORT || 8080, () => {
