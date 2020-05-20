@@ -36,7 +36,7 @@ exports.getDownload = (template_name) => {
         package_templates = package_directory + "waveTemplates/";
 
 
-  const output = fs.createWriteStream(staging_directory + "/package.zip")
+  const output = fs.createWriteStream(staging_directory + "package.zip")
 
 
   archive.on("error", (err) => {
@@ -45,7 +45,7 @@ exports.getDownload = (template_name) => {
 
   archive.on("end", () => {
     console.log("Pointer size:", archive.pointer(), "bytes.")
-    return staging_directory + "/package.zip"
+    return staging_directory + "package.zip"
   })
 
   archive.append(package.generateXML(), { name: package_file })
