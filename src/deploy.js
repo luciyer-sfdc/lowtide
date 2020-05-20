@@ -17,36 +17,74 @@ const DEFAULT_DEPLOY_OPTIONS = {
   singlePackage: false
 }
 
+const CREATE_FILE = false
+
+const logTime = (message) => {
+  console.log(new Date().toLocaleTimeString() + ":", message)
+}
+
+exports.deleteTemplate = (conn, template_name) => {
+
+}
+
 exports.fromRepository = (conn, template_list) => {
 
   const archive = archiver("zip")
-  const cwd = path.join(__dirname, '..')
-  const template_directory = cwd + process.env.TEMPLATE_DIR
+
+  const cwd = path.join(__dirname, '..'),
+        template_directory = cwd + process.env.TEMPLATE_DIR;
+
+  const package_directory = "pkg/",
+        package_file = package_directory + "package.xml",
+        package_templates = package_directory + "waveTemplates/";
+
+  // FOR DEBUG PURPOSES - to inspect archive structure
+  if (CREATE_FILE) {
+    const staging_directory = cwd + process.env.STAGING_DIR
+    const output = fs.createWriteStream(staging_directory + '/package.zip')
+    archive.pipe(output)
+  }
 
   archive.on("error", (err) => {
-    throw err;
+    return console.error(err)
   })
+
+  archive.on("end", () => {
+    console.log("Pointer size:", archive.pointer(), "bytes.")
+  })
+
+  archive.append(package.generateXML(), { name: package_file })
 
   template_list.forEach((template) => {
-      archive.directory(
-        template_directory + template,
-        "waveTemplates/" + template
-      )
+    archive.directory(
+      template_directory + template,
+      package_templates + template
+    )
   })
-
-  archive.append(package.generateXML(), { name: "package.xml" });
 
   archive.finalize()
 
-  conn.metadata.pollTimeout = 90*1000;
+  logTime("Starting deploy to " + conn.instanceUrl)
 
-  conn.metadata.deploy(archive, {})
-    .complete(true, (err, result) => {
-      if (err) { console.error(err) }
-      if (result) {
-        console.log("Result", result)
-        console.log("Errors", result.details.componentFailures)
-      }
-    })
+  const start_time = Date.now();
+
+  conn.metadata.pollInterval = 5 * 1000;
+  conn.metadata.pollTimeout = 60 * 1000;
+
+  let deploy = conn.metadata.deploy(archive, DEFAULT_DEPLOY_OPTIONS)
+
+  deploy
+    .on("progress", logTime)
+    .on("complete", logTime)
+    .on("error", console.error)
+
+  return deploy.complete(true, (error, result) => {
+    if (!error) {
+      console.log("Id:", result.id)
+      console.log("Status:", result.status)
+      console.log("Details:", result.details)
+      return result
+    } return error
+  })
 
 }

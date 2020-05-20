@@ -19,6 +19,8 @@ const lowtide = require("./src"),
       repository = lowtide.repository,
       deploy = lowtide.deploy
 
+const template_list = util.listTemplates();
+
 const db_uri = process.env.MONGODB_URI || "mongodb://localhost/dev"
 
 mongoose.connect(db_uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -32,7 +34,7 @@ app
   .use(express.urlencoded({ extended: true }))
   .use(session({
     genid: (req) => { return uuidv4() },
-    secret: "some secret here stored in process.env",
+    secret: process.env.SESSION_SECRET,
     cookie: { maxAge: (60 * 60 * 1000) },
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
     resave: false,
@@ -41,6 +43,9 @@ app
 
 
 app.use(function (req, res, next) {
+
+  if (process.env.BASE_URL === "http://localhost:8080")
+    return next()
 
   if ( (!req.session.salesforce || req.session.salesforce.authResponse === undefined) &&
       req.path !== config.routes.auth.callback) {
@@ -79,6 +84,7 @@ app.use(function (req, res, next) {
     console.log("Cookie:", req.session.cookie)
     console.log("Routing request.")
     next()
+
   }
 
 })
@@ -170,12 +176,11 @@ app.get(config.routes.templates.existing, (req, res) => {
 
 app.get(config.routes.templates.available, (req, res) => {
 
-  const conn = auth.getConnection(req.session)
-
+  res.status(200).json(template_list)
 
 })
 
-app.get(config.routes.templates.deploy, (req, res) => {
+app.post(config.routes.templates.deploy, (req, res) => {
 
   const conn = auth.getConnection(req.session)
 

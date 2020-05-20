@@ -14,11 +14,16 @@ exports.logAuth = (conn, userInfo) => {
   console.log("Access Token: " + conn.accessToken)
 }
 
-exports.scheduleDelete = (date, folder_id) => {
+exports.stayAwake = () => {
 
 }
 
-exports.stayAwake = () => {
+exports.listTemplates = () => {
+
+  const cwd = path.join(__dirname, '..'),
+        template_directory = cwd + process.env.TEMPLATE_DIR;
+
+  return fs.readdirSync(template_directory)
 
 }
 
