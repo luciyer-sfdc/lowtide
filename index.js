@@ -99,7 +99,6 @@ app.all(config.routes.all, (req, res, next) => {
   next()
 })
 
-
 app.get(config.routes.auth.callback, (req, res, next) => {
 
   console.log("Authorizing with Oauth2.")
@@ -159,7 +158,7 @@ app.get(config.routes.auth.revoke, (req, res) => {
 
 })
 
-app.get(config.routes.templates.existing, (req, res) => {
+app.get(config.routes.org.list, (req, res) => {
 
   const conn = auth.getConnection(req.session)
 
@@ -169,21 +168,69 @@ app.get(config.routes.templates.existing, (req, res) => {
     })
     .catch(error => {
       console.error(error)
-      res.sendStatus(500)
+      res.status(500).json(error)
     })
 
 })
 
-app.get(config.routes.templates.available, (req, res) => {
+app.get(config.routes.org.base + "/:template_id", (req, res) => {
+
+  const tid = req.params.template_id
+  const conn = auth.getConnection(req.session)
+
+  conn.request(process.env.API_ENDPOINT + "templates/" + tid)
+    .then(result => {
+      res.status(200).json(result)
+    })
+    .catch(error => {
+      console.error(error)
+      res.status(500).json(error)
+    })
+
+})
+
+app.delete(config.routes.org.base + "/:template_id", (req, res) => {
+
+  const tid = req.params.template_id
+  const conn = auth.getConnection(req.session)
+
+  conn.requestDelete(process.env.API_ENDPOINT + "templates/" + tid)
+    .then(result => {
+      res.status(200).json(result)
+    })
+    .catch(error => {
+      console.error(error)
+      res.status(500).json(error)
+    })
+
+})
+
+app.get(config.routes.repository.list, (req, res) => {
 
   res.status(200).json(template_list)
 
 })
 
-app.post(config.routes.templates.deploy, (req, res) => {
+app.post(config.routes.repository.deploy, (req, res) => {
 
   const conn = auth.getConnection(req.session)
 
   deploy.fromRepository(conn, ["CSV_Template"])
+
+})
+
+app.get(config.routes.repository.download + "/:template_name", (req, res) => {
+
+  const tname = req.params.template_name
+
+  deploy.getDownload(template_name)
+    .then(file_path => {
+      res.download(file_path, template_name + ".zip")
+    })
+    .catch(error => {
+      console.error(error)
+      res.status(500).json(error)
+    })
+
 
 })

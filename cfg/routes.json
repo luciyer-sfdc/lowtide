@@ -5,9 +5,18 @@
     "callback" : "/api/auth/callback",
     "revoke" : "/api/auth/revoke"
   },
-  "templates" : {
-    "existing" : "/api/templates/org",
-    "available" : "/api/templates/repository",
-    "deploy" : "/api/templates/deploy"
+  "org" : {
+    "base" : "/api/org/template",
+    "list" : "/api/org/template/all",
+    "download" : "/api/org/template/download"
+  },
+  "repository" : {
+    "base" : "/api/repo/template",
+    "list" : "/api/repo/template/all",
+    "deploy" : "/api/repo/template/deploy",
+    "download" : "/api/repo/template/download"
+  },
+  "upload" : {
+
   }
 }
