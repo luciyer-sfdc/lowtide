@@ -174,6 +174,13 @@ app.get(config.routes.templates.available, (req, res) => {
 
   const conn = auth.getConnection(req.session)
 
+
+})
+
+app.get(config.routes.templates.deploy, (req, res) => {
+
+  const conn = auth.getConnection(req.session)
+
   deploy.fromRepository(conn, ["CSV_Template"])
 
 })
