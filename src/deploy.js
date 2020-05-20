@@ -21,7 +21,6 @@ exports.fromRepository = (conn, template_list) => {
 
   const archive = archiver("zip")
   const cwd = path.join(__dirname, '..')
-  const staging_directory = cwd + process.env.STAGING_DIR
   const template_directory = cwd + process.env.TEMPLATE_DIR
 
   archive.on("error", (err) => {
