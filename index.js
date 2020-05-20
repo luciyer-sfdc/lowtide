@@ -223,9 +223,9 @@ app.get(config.routes.repository.download + "/:template_name", (req, res) => {
 
   const tname = req.params.template_name
 
-  deploy.getDownload(template_name)
+  deploy.getDownload(tname)
     .then(file_path => {
-      res.download(file_path, template_name + ".zip")
+      res.download(file_path, tname + ".zip")
     })
     .catch(error => {
       console.error(error)
