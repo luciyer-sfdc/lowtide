@@ -86,6 +86,7 @@ app.use(function (req, res, next) {
 app
   .listen(process.env.PORT || 8080, () => {
     console.log("Server Up.")
+    util.clearStaging();
   })
 
 app.all(config.routes.all, (req, res, next) => {
