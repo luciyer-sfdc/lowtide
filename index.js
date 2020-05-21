@@ -145,14 +145,18 @@ app.get(config.routes.auth.revoke, (req, res) => {
   if (req.session.salesforce.type === "oauth2") {
     conn.logoutByOAuth2(() => {
       req.session.destroy(() => {
-        res.status(200).json({ message: "Logout via oauth2 successful." })
+        res.status(200).json({ message: "Logout successful." })
       })
+    }).catch(error => {
+      res.status(500).json(error)
     })
   } else if (req.session.salesforce.type === "session") {
     conn.logout(() => {
       req.session.destroy(() => {
-        res.status(200).json({ message: "Logout via oauth2 successful." })
+        res.status(200).json({ message: "Logout successful." })
       })
+    }).catch(error => {
+      res.status(500).json(error)
     })
   }
 
@@ -231,7 +235,7 @@ app.post(config.routes.repository.deploy, (req, res) => {
   console.log(req.body.templates)
   console.log(Array.isArray(req.body.templates))
 
-  
+
 
   deploy.fromRepository(conn, req.body.templates)
     .then(result => {
