@@ -158,6 +158,17 @@ app.get(config.routes.auth.revoke, (req, res) => {
 
 })
 
+
+/* HOME */
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    "salesforce_instance": req.session.salesforce.authResponse.instanceUrl
+  })
+})
+
+/* ORG OPERATIONS */
+
 app.get(config.routes.org.list, (req, res) => {
 
   const conn = auth.getConnection(req.session)
@@ -204,6 +215,8 @@ app.delete(config.routes.org.base + "/:template_id", (req, res) => {
     })
 
 })
+
+/* REPOSITORY OPERATIONS */
 
 app.get(config.routes.repository.list, (req, res) => {
 
