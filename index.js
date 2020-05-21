@@ -214,8 +214,13 @@ app.get(config.routes.repository.list, (req, res) => {
 app.post(config.routes.repository.deploy, (req, res) => {
 
   const conn = auth.getConnection(req.session)
-
-  deploy.fromRepository(conn, ["CSV_Template"])
+  deploy.fromRepository(conn, req.body.templates)
+    .then(result => {
+      res.status(200).json(result)
+    })
+    .catch(error => {
+      res.status(500).json(error)
+    })
 
 })
 
@@ -223,14 +228,6 @@ app.get(config.routes.repository.download + "/:template_name", (req, res) => {
 
   const tname = req.params.template_name
 
-  deploy.getDownload(tname)
-    .then(file_path => {
-      res.download(file_path, tname + ".zip")
-    })
-    .catch(error => {
-      console.error(error)
-      res.status(500).json(error)
-    })
-
+  //Implement
 
 })

@@ -16,7 +16,5 @@
     "deploy" : "/api/repo/template/deploy",
     "download" : "/api/repo/template/download"
   },
-  "upload" : {
-
-  }
+  "upload" : {}
 }

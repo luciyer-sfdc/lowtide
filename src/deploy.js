@@ -25,38 +25,7 @@ const logTime = (message) => {
 
 exports.getDownload = (template_name) => {
 
-  const archive = archiver("zip")
-
-  const cwd = path.join(__dirname, '..'),
-        template_directory = cwd + process.env.TEMPLATE_DIR,
-        staging_directory = cwd + process.env.STAGING_DIR;
-
-  const package_directory = "pkg/",
-        package_file = package_directory + "package.xml",
-        package_templates = package_directory + "waveTemplates/";
-
-
-  const output = fs.createWriteStream(staging_directory + "package.zip")
-
-
-  archive.on("error", (err) => {
-    return console.error(err)
-  })
-
-  archive.on("end", () => {
-    console.log("Pointer size:", archive.pointer(), "bytes.")
-    return staging_directory + "package.zip"
-  })
-
-  archive.append(package.generateXML(), { name: package_file })
-
-  archive.directory(
-    template_directory + template_name,
-    package_templates + template_name
-  )
-
-  archive.pipe(output)
-  archive.finalize()
+  // Implement
 
 }
 
