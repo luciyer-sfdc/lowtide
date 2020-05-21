@@ -227,10 +227,9 @@ app.get(config.routes.repository.list, (req, res) => {
 app.post(config.routes.repository.deploy, (req, res) => {
 
   const conn = auth.getConnection(req.session)
-  console.log(req.body)
 
-  res.sendStatus(200)
-  /*
+  console.log(req.body.templates)
+
   deploy.fromRepository(conn, req.body.templates)
     .then(result => {
       res.status(200).json(result)
@@ -238,7 +237,7 @@ app.post(config.routes.repository.deploy, (req, res) => {
     .catch(error => {
       res.status(500).json(error)
     })
-  */
+
 })
 
 app.get(config.routes.repository.download + "/:template_name", (req, res) => {
