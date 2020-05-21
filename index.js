@@ -229,6 +229,9 @@ app.post(config.routes.repository.deploy, (req, res) => {
   const conn = auth.getConnection(req.session)
 
   console.log(req.body.templates)
+  console.log(Array.isArray(req.body.templates))
+
+  
 
   deploy.fromRepository(conn, req.body.templates)
     .then(result => {
