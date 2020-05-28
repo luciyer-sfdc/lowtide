@@ -1,5 +1,13 @@
 const jsforce = require("jsforce")
 
+const foundConnection = (session) => {
+  return (
+    session.salesforce &&
+    session.salesforce.authResponse !== {} &&
+    session.salesforce.authResponse !== undefined &&
+  )
+}
+
 const getStoredConnection = (session) => {
   return new jsforce.Connection({
     accessToken: session.salesforce.authResponse.accessToken,
@@ -8,6 +16,7 @@ const getStoredConnection = (session) => {
 }
 
 module.exports = {
+  foundConnection: foundConnection,
   getStoredConnection: getStoredConnection,
   testing: require("./test_connection"),
   session: require("./session"),

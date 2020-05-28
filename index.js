@@ -14,9 +14,9 @@ const mongoose = require("mongoose")
 const MongoStore = require("connect-mongo")(session)
 
 const config = require("./config")
+const auth = require("./src/auth")
 
 const lowtide = require("./src"),
-      auth = lowtide.auth,
       util = lowtide.util,
       package = lowtide.package,
       repository = lowtide.repository,
@@ -104,48 +104,64 @@ app.all(config.routes.all, (req, res, next) => {
   next()
 })
 
-app.get(config.routes.auth.callback, (req, res, next) => {
+app.get(config.routes.auth.request, (req, res, next) => {
 
-  console.log("Authorizing with Oauth2.")
+  if (auth.foundConnection(req.session)) {
 
-  const sf_object = {
-    type: "oauth2",
-    opened: new Date(),
-    rest: process.env.API_ENDPOINT,
-    authCredentials: {},
-    authResponse: {}
+    console.log("Salesforce found on session:", req.sessionID)
+    console.log("SF Details:", req.session.salesforce.authResponse)
+    console.log("Cookie:", req.session.cookie)
+    console.log("Routing request.")
+    next()
+
   }
 
-  sf_object.authCredentials = auth.getOauthObject()
+  else {
 
-  let conn = new jsforce.Connection(sf_object.authCredentials)
+    console.log("No Salesforce session found. Initializing...")
 
-  conn.authorize(req.query.code, (err, userInfo) => {
+    if (req.get("source") === "session") {
 
-    if (!err) {
+      auth.session.store(req)
+        .then(sf => {
+          req.session.salesforce = sf
+        })
+        .catch(console.error)
 
-      sf_object.authResponse = {
-        accessToken: conn.accessToken,
-        instanceUrl: conn.instanceUrl
-      }
+    } else if (req.get("source") === "oauth2") {
 
-      req.session.salesforce = sf_object
+      res.redirect(auth.oauth2.getUrl())
+
+    } else {
+      res.status(500).json({
+        error: "No source header found on request. Unable to authenticate with Salesforce"
+      })
+    }
+
+  }
+
+})
+
+app.get(config.routes.auth.callback, (req, res, next) => {
+
+  auth.oauth2.store(req)
+    .then(sf => {
+      req.session.salesforce = sf
 
       console.log("Redirecting to Homepage.")
       res.redirect("/")
 
-    } else {
-      console.error(err)
-      res.status(500).json({ error: err })
-    }
-
-  })
+    })
+    .catch(error => {
+      console.error(error)
+      res.status(500).json(error.message)
+    })
 
 })
 
 app.get(config.routes.auth.revoke, (req, res) => {
 
-  const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
   if (req.session.salesforce.type === "oauth2") {
     conn.logoutByOAuth2(() => {
@@ -179,7 +195,7 @@ app.get("/", (req, res) => {
 
 app.get(config.routes.org.list, (req, res) => {
 
-  const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
   conn.request(process.env.API_ENDPOINT + "templates")
     .then(result => {
@@ -195,7 +211,7 @@ app.get(config.routes.org.list, (req, res) => {
 app.get(config.routes.org.base + "/:template_id", (req, res) => {
 
   const tid = req.params.template_id
-  const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
   conn.request(process.env.API_ENDPOINT + "templates/" + tid)
     .then(result => {
@@ -211,7 +227,7 @@ app.get(config.routes.org.base + "/:template_id", (req, res) => {
 app.delete(config.routes.org.base + "/:template_id", (req, res) => {
 
   const tid = req.params.template_id
-  const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
   conn.requestDelete(process.env.API_ENDPOINT + "templates/" + tid)
     .then(result => {
@@ -234,7 +250,7 @@ app.get(config.routes.repository.list, (req, res) => {
 
 app.post(config.routes.repository.deploy, (req, res) => {
 
-  const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
   console.log("Deploy Attempt:", req.body.templates)=
 
@@ -259,9 +275,9 @@ app.get(config.routes.repository.download + "/:template_name", (req, res) => {
 
 app.get(config.routes.dataflow.list, (req, res) => {
 
-  //const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
-  timeshift.dataflow.list(null)
+  timeshift.dataflow.list(conn)
     .then(result => {
       console.log(result)
       res.status(200).json(result)
@@ -276,9 +292,9 @@ app.get(config.routes.dataflow.list, (req, res) => {
 
 app.post(config.routes.dataflow.base, (req, res) => {
 
-  //const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
-  timeshift.dataflow.create(null, "dfname3", "dflabel3", {})
+  timeshift.dataflow.create(conn, "dfname3", "dflabel3", {})
     .then(result => {
       console.log(result)
       res.status(200).json(result)
@@ -293,11 +309,11 @@ app.post(config.routes.dataflow.base, (req, res) => {
 
 app.get(config.routes.dataflow.base + "/:dataflow_id", (req, res) => {
 
-  //const conn = auth.getConnection(req.session)
+  const conn = auth.getStoredConnection(req.session)
 
   const dfid = req.params.dataflow_id
 
-  timeshift.dataflow.update(null, dfid, "dfname3", "dflabel3", {})
+  timeshift.dataflow.update(conn, dfid, "dfname3", "dflabel3", {})
     .then(result => {
       console.log(result)
       res.status(200).json(result)
