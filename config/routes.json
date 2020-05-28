@@ -1,6 +1,7 @@
 {
   "all" : "*",
   "auth" : {
+    "required" : "/api/*",
     "request" : "/api/auth",
     "callback" : "/api/auth/callback",
     "revoke" : "/api/auth/revoke"
