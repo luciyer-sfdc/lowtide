@@ -4,7 +4,7 @@ const foundConnection = (session) => {
   return (
     session.salesforce &&
     session.salesforce.authResponse !== {} &&
-    session.salesforce.authResponse !== undefined &&
+    session.salesforce.authResponse !== undefined
   )
 }
 

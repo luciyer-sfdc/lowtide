@@ -46,54 +46,6 @@ app
     saveUninitialized: true
   }))
 
-
-app.use((req, res, next) => {
-
-  if (process.env.BASE_URL === "http://localhost:8080")
-    return next()
-
-  if ( (!req.session.salesforce || req.session.salesforce.authResponse === undefined) &&
-      req.path !== config.routes.auth.callback) {
-
-    console.log("No Salesforce session. Initializing...")
-
-    req.session.salesforce = {}
-
-    try {
-
-      if (req.get("source") === "session") {
-
-        auth.storeInternal(req)
-          .then(sfdc => {
-            console.log("Routing request.")
-            req.session.salesforce = sfdc
-            next()
-          })
-          .catch(error => {
-            console.error(error)
-          })
-
-      } else {
-        console.log("Routing to Salesforce Oauth URL.")
-        res.redirect(auth.getAuthUrl())
-      }
-
-    } catch (err) {
-      console.error(err)
-    }
-
-  } else {
-
-    console.log("Salesforce found on session:", req.sessionID)
-    console.log("SF Details:", req.session.salesforce.authResponse)
-    console.log("Cookie:", req.session.cookie)
-    console.log("Routing request.")
-    next()
-
-  }
-
-})
-
 app
   .listen(process.env.PORT || 8080, () => {
     console.log("Server Up.")
@@ -104,15 +56,13 @@ app.all(config.routes.all, (req, res, next) => {
   next()
 })
 
-app.get(config.routes.auth.request, (req, res, next) => {
+app.get(config.routes.auth.request, (req, res) => {
 
   if (auth.foundConnection(req.session)) {
 
     console.log("Salesforce found on session:", req.sessionID)
     console.log("SF Details:", req.session.salesforce.authResponse)
     console.log("Cookie:", req.session.cookie)
-    console.log("Routing request.")
-    next()
 
   }
 
