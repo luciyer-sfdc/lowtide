@@ -18,7 +18,7 @@ const getStoredConnection = (session) => {
 module.exports = {
   foundConnection: foundConnection,
   getStoredConnection: getStoredConnection,
-  testing: require("./test_connection"),
+  oauth2: require("./oauth2"),
   session: require("./session"),
-  oauth2: require("./oauth2")
+  testing: require("./test_connection")
 }
