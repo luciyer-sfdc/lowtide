@@ -78,14 +78,8 @@ app.get(config.routes.auth.request, (req, res) => {
         })
         .catch(console.error)
 
-    } else if (req.get("source") === "oauth2") {
-
-      res.redirect(auth.oauth2.getUrl())
-
     } else {
-      res.status(500).json({
-        error: "No source header found on request. Unable to authenticate with Salesforce"
-      })
+      res.redirect(auth.oauth2.getUrl())
     }
 
   }
@@ -137,7 +131,7 @@ app.get(config.routes.auth.revoke, (req, res) => {
 
 app.get("/", (req, res) => {
   res.status(200).json({
-    "salesforce_instance": req.session.salesforce.authResponse.instanceUrl
+    "session": req.session
   })
 })
 
