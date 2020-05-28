@@ -1,5 +1,7 @@
 const jsforce = require("jsforce")
 
+const config = require(appRoot + "/config")
+
 const foundConnection = (session) => {
   return (
     session.salesforce &&
@@ -13,6 +15,14 @@ const getStoredConnection = (session) => {
     accessToken: session.salesforce.authResponse.accessToken,
     instanceUrl: session.salesforce.authResponse.instanceUrl
   })
+}
+
+const isAuthenticating = (req) => {
+  return (
+    req.path === config.routes.auth.request ||
+    req.path === config.routes.auth.callback ||
+    req.path === config.routes.auth.revoke
+  )
 }
 
 module.exports = {
