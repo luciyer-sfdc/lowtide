@@ -44,8 +44,8 @@ exports.store = (req) => {
 
       } else {
 
-        console.error(err)
-        reject(err)
+        console.error(error)
+        reject(error)
 
       }
 
