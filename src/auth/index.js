@@ -10,13 +10,6 @@ const foundConnection = (session) => {
   )
 }
 
-const getStoredConnection = (session) => {
-  return new jsforce.Connection({
-    accessToken: session.salesforce.authResponse.accessToken,
-    instanceUrl: session.salesforce.authResponse.instanceUrl
-  })
-}
-
 const isAuthenticating = (req) => {
   return (
     req.path === config.routes.auth.request ||
@@ -25,8 +18,16 @@ const isAuthenticating = (req) => {
   )
 }
 
+const getStoredConnection = (session) => {
+  return new jsforce.Connection({
+    accessToken: session.salesforce.authResponse.accessToken,
+    instanceUrl: session.salesforce.authResponse.instanceUrl
+  })
+}
+
 module.exports = {
   foundConnection: foundConnection,
+  isAuthenticating: isAuthenticating,
   getStoredConnection: getStoredConnection,
   oauth2: require("./oauth2"),
   session: require("./session"),
