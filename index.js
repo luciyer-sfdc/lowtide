@@ -64,6 +64,10 @@ app.get(config.routes.auth.request, (req, res) => {
     console.log("SF Details:", req.session.salesforce.authResponse)
     console.log("Cookie:", req.session.cookie)
 
+    res.status(200).json({
+      message: `Authenticated with: ${req.session.salesforce.authResponse.instanceUrl}`
+    })
+
   }
 
   else {
