@@ -1,7 +1,7 @@
 require("dotenv").config()
 
 const jsforce = require("jsforce")
-const config = require("./config.js")
+const config = require("../config")
 
 const oauth2 = new jsforce.OAuth2({
   clientId: process.env.CLIENT_ID,

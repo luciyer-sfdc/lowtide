@@ -16,5 +16,11 @@
     "deploy" : "/api/repo/template/deploy",
     "download" : "/api/repo/template/download"
   },
+  "dataflow" : {
+    "base" : "/api/dataflow",
+    "list" : "/api/dataflow/all",
+    "schedule" : "/api/dataflow/schedule",
+    "run" : "/api/dataflow/run"
+  },
   "upload" : {}
 }

@@ -3,5 +3,6 @@
     "base_url" : "/services/data/",
     "api_version" : "v48.0",
     "subdirectory" : "/wave/"
-  }
+  },
+  "dataflow" : "dataflows"
 }
