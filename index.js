@@ -79,6 +79,7 @@ app.get(config.routes.auth.request, (req, res) => {
       auth.session.store(req)
         .then(sf => {
           req.session.salesforce = sf
+          res.sendStatus(200)
         })
         .catch(console.error)
 
