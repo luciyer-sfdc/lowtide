@@ -1,5 +1,7 @@
 require("dotenv").config()
 
+const jsforce = require("jsforce")
+
 exports.store = (req) => {
 
   console.log("Authorizing with Salesforce Session.")

@@ -3,8 +3,6 @@ const jsforce = require("jsforce")
 const config = require(appRoot + "/config")
 const { Payload } = require("./objects")
 
-const auth = require(appRoot + "/src/auth") //Testing
-
 const df_endpoint = config.endpoints.dataflows
 
 exports.list = async (connection) => {
