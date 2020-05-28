@@ -58,7 +58,7 @@ app.all(config.routes.all, (req, res, next) => {
 
 app.all(config.routes.auth.required, (req, res, next) => {
 
-  if (!auth.foundConnection(req.session))
+  if (!auth.foundConnection(req.session) && req.path !== config.routes.auth.request)
     return res.status(500).json({
       message: "Not authenticated with Salesforce. Please GET /api/auth."
     })
