@@ -15,6 +15,7 @@ const MongoStore = require("connect-mongo")(session)
 
 const config = require("./config")
 const auth = require("./src/auth")
+const template = require("./src/template")
 
 const lowtide = require("./src"),
       util = lowtide.util,
@@ -51,10 +52,14 @@ app
     console.log("Server Up.")
   })
 
+/* LOGGING REQUESTS */
+
 app.all(config.routes.all, (req, res, next) => {
   console.log(`[${util.timestamp()}] ${req.method}: ${req.originalUrl}`)
   next()
 })
+
+/* AUTH */
 
 app.all(config.routes.auth.required, (req, res, next) => {
 
@@ -151,6 +156,12 @@ app.get("/", (req, res) => {
   })
 })
 
+app.get("/api/test", (req, res) => {
+  const conn = auth.getStoredConnection(req.session)
+  const prog = template.deploy.fromRepository(conn, ["CSV_Template", "Mortgage_Calculator"])
+  res.status(200).json(prog)
+})
+
 /* ORG OPERATIONS */
 
 app.get(config.routes.org.list, (req, res) => {
@@ -232,6 +243,7 @@ app.get(config.routes.repository.download + "/:template_name", (req, res) => {
 
 })
 
+/* DATAFLOW OPERATIONS */
 
 app.get(config.routes.dataflow.list, (req, res) => {
 
@@ -266,7 +278,6 @@ app.post(config.routes.dataflow.base, (req, res) => {
 
 })
 
-
 app.get(config.routes.dataflow.base + "/:dataflow_id", (req, res) => {
 
   const conn = auth.getStoredConnection(req.session)
@@ -284,3 +295,5 @@ app.get(config.routes.dataflow.base + "/:dataflow_id", (req, res) => {
     })
 
 })
+
+/* DOWNLOAD & UPLOAD OPERATIONS */
