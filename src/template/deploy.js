@@ -73,14 +73,6 @@ exports.fromRepository = (conn, template_list) => {
 
   let deploy = conn.metadata.deploy(archive, DEFAULT_DEPLOY_OPTIONS)
 
-  deploy
-    .on("progress", (output) => {
-      return output
-    })
-    .on("complete", logTime)
-    .on("error", console.error)
-
-
   deploy.complete(true, (error, result) => {
     if (!error) {
       console.log("Id:", result.id)
@@ -89,6 +81,16 @@ exports.fromRepository = (conn, template_list) => {
       return result
     } return error
   })
+
+  return deploy
+    .on("progress", (output) => {
+      return new Promise((resolve, reject) => {
+        resolve(output)
+      })
+    })
+    .on("complete", logTime)
+    .on("error", console.error)
+
 
 
 }
