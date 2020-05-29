@@ -17,9 +17,6 @@ const config = require("./config")
 const auth = require("./src/auth")
 const template = require("./src/template")
 
-console.log(template)
-console.log(template.deploy)
-
 const lowtide = require("./src"),
       util = lowtide.util,
       package = lowtide.package,

@@ -82,15 +82,18 @@ exports.fromRepository = (conn, template_list) => {
     } return error
   })
 
-  return deploy
-    .on("progress", (output) => {
-      return new Promise((resolve, reject) => {
-        resolve(output)
+  return new Promise((resolve, reject) => {
+    deploy
+      .on("progress", (output) => {
+          console.log("Progress:", output)
+          resolve(output)
       })
-    })
-    .on("complete", logTime)
-    .on("error", console.error)
-
+      .on("complete", logTime)
+      .on("error", (error) => {
+        console.error("Error:", error)
+        reject(error)
+      })
+  })
 
 
 }
