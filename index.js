@@ -157,9 +157,17 @@ app.get("/", (req, res) => {
 })
 
 app.get("/api/test", (req, res) => {
+
   const conn = auth.getStoredConnection(req.session)
-  const prog = template.deploy.fromRepository(conn, ["CSV_Template", "Mortgage_Calculator"])
-  res.status(200).json(prog)
+  
+  template.deploy.fromRepository(conn, ["CSV_Template", "Mortgage_Calculator"])
+    .then(prog => {
+      res.status(200).json(prog)
+    })
+    .catch(error => {
+      res.status(500).json(error)
+    })
+
 })
 
 /* ORG OPERATIONS */
