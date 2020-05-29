@@ -3,7 +3,7 @@ const fsp = require("fs").promises
 const copyDirectory = require("ncp").ncp
 
 const package = require("./package.js")
-const WaveTemplate = require("./template.js")
+const WaveTemplate = require("./template_object.js")
 
 const T_REPO = path.normalize("./template_repository")
 const T_STAGING = path.normalize("./staging_repository")
