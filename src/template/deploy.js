@@ -19,6 +19,14 @@ const DEFAULT_DEPLOY_OPTIONS = {
 
 const CREATE_FILE = false
 
+class TemplateDeploy {
+
+  constructor(id, status, template_list) {
+
+  }
+
+}
+
 const logTime = (message) => {
   console.log(new Date().toLocaleTimeString() + ":", message)
 }

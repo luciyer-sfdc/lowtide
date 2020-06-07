@@ -159,14 +159,20 @@ app.get("/", (req, res) => {
 app.get("/api/test", (req, res) => {
 
   const conn = auth.getStoredConnection(req.session)
-  
-  template.deploy.fromRepository(conn, ["CSV_Template", "Mortgage_Calculator"])
+
+  template.deploy.fromRepository(conn, template_list)
     .then(prog => {
       res.status(200).json(prog)
     })
     .catch(error => {
       res.status(500).json(error)
     })
+
+})
+
+app.get("/api/status", (req, res) => {
+
+
 
 })
 
@@ -270,14 +276,39 @@ app.get(config.routes.dataflow.list, (req, res) => {
 
 })
 
-app.post(config.routes.dataflow.base, (req, res) => {
+app.post(config.routes.dataflow.base, async (req, res) => {
+
+  if (!util.bodyHasField(req, "source_app_id"))
+    return res.status(500).json({
+      "message" : "Request body requires source_app_id."
+    })
+
+  const app_id = req.body.source_dataset_id,
+        user_date = null;
+
+  if (!util.bodyHasField(req, "user_timeshift_date")) {
+    // Run queries, generate suggested date
+
+
+  } else {
+    user_date = req.body.user_timeshift_date
+  }
 
   const conn = auth.getStoredConnection(req.session)
 
-  timeshift.dataflow.create(conn, "dfname3", "dflabel3", {})
-    .then(result => {
-      console.log(result)
-      res.status(200).json(result)
+  timeshift.dataflow.generate(ds_id, user_date)
+    .then(ts_dataflow => {
+
+      timeshift.dataflow.create(conn, ts_dataflow)
+        .then(result => {
+          console.log(result)
+          res.status(200).json(result)
+        })
+        .catch(error => {
+          console.error(error.message)
+          res.status(500).json(error.message)
+        })
+
     })
     .catch(error => {
       console.error(error.message)

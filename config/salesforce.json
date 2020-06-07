@@ -4,5 +4,8 @@
     "api_version" : "v48.0",
     "subdirectory" : "/wave/"
   },
-  "dataflow" : "dataflows"
+  "dataflow" : "dataflows/",
+  "dataflowjob" : "dataflowjobs/",
+  "dataset" : "datasets/",
+  "query" : "query/"
 }

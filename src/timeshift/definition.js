@@ -170,25 +170,6 @@ class ComputedField {
 
 }
 
-class LatestDateQuery {
-
-  constructor(dataset_id, dataset_version_id, field) {
-    this.field = field;
-    this.load = `q = load \"${dataset_id}/${dataset_version_id}\";`;
-    this.foreach = `q = foreach q generate '${field}_Year' + \"-\" + '${field}_Month' + \"-\" + '${field}_Day' as '__Latest_YMD', count() as 'count';`;
-    this.order = `q = order q by '__Latest_YMD' desc;`;
-    this.limit = `q = limit q 1;`;
-
-    this.query = { "query" : `${this.load} ${this.foreach} ${this.order} ${this.limit}` };
-
-  }
-
-  get json() {
-    return JSON.stringify(this.query);
-  }
-
-}
-
 module.exports = {
     Branch: Branch,
     Node: Node,
@@ -196,6 +177,5 @@ module.exports = {
     Register: Register,
     Slice: Slice,
     Compute: Compute,
-    ComputedField: ComputedField,
-    DateQuery: LatestDateQuery
+    ComputedField: ComputedField
 }

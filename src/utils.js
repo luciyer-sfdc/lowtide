@@ -3,6 +3,13 @@ require("dotenv").config()
 const fs = require("fs")
 const path = require("path")
 
+exports.bodyHasField = (req, field_name) => {
+  return (
+    !req.body[field_name] &&
+    req.body[field_name] !== ""
+  )
+}
+
 exports.timestamp = () => {
   return new Date().toLocaleTimeString()
 }
