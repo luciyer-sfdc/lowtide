@@ -1,13 +1,15 @@
 const jsforce = require("jsforce")
 
 const config = require(appRoot + "/config")
+const dates = require("./dates")
+const dataset = require("./datasets")
+
+const { Branch } = require("./definition")
 const {
   DataflowSObject,
   DataflowVersionSObject,
   DataflowJobPayload
 } = require("./objects")
-const { Branch } = require("./definition")
-const dates = require("./dates")
 
 const df_endpoint = config.endpoints.dataflows,
       dfjob_endpoint = config.endpoints.dataflowjobs;
@@ -33,19 +35,7 @@ const updateDfCurrentId = (conn, df_id, df_vid) => {
 
 }
 
-const generateAppTimeshiftDataflow = (conn, app_id) => {
-
-  /*
-
-  return Promise.allSettled(dataset_info.date_fields.map(field_info => {
-    return executeQuery(conn, dataset_info, field_info)
-  }))
-
-  */
-
-}
-
-exports.generateBranch = (conn, dataset_id, latest_date) => {
+const getDatasetBranch = (conn, dataset_id, latest_date) => {
 
   const branch_settings = {}
 
@@ -64,9 +54,11 @@ exports.generateBranch = (conn, dataset_id, latest_date) => {
             return d.value
           })
 
-          branch_settings.lp_date = parsed_results.suggested_date
+          if (latest_date)
+            branch_settings.lp_date = latest_date
+          else
+            branch_settings.lp_date = parsed_results.suggested_date
 
-          console.log(branch_settings)
           return new Branch(branch_settings)
 
         })
@@ -77,8 +69,37 @@ exports.generateBranch = (conn, dataset_id, latest_date) => {
 
 }
 
-exports.amendBranch = () => {
-  //Implement: fix issue
+const generateAppTimeshiftDataflow = (conn, ts_array) => {
+
+  /*
+  ts_array = [
+    { id: xxx, date: yyyy-mm-dd },
+    { id: xxx, date: yyyy-mm-dd }
+  ]
+  */
+
+  return Promise.allSettled(ts_array.map(dataset => {
+
+    if (dataset.date)
+      return getDatasetBranch(conn, dataset.id, dataset.date)
+    else
+      return getDatasetBranch(conn, dataset.id)
+
+  }))
+
+
+}
+
+exports.timeshiftApp = (conn, dataset_array) => {
+  return generateAppTimeshiftDataflow(conn, dataset_array)
+}
+
+exports.generateBranch = (conn, dataset_id, latest_date) => {
+  return getDatasetBranch(conn, dataset_id, latest_date)
+}
+
+exports.amendDataflow = () => {
+  //Implement: fix LPD after first run
 }
 
 exports.list = (conn) => {

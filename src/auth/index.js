@@ -31,5 +31,6 @@ module.exports = {
   getStoredConnection: getStoredConnection,
   oauth2: require("./oauth2"),
   session: require("./session"),
+  credentials: require("./credentials"),
   testing: require("./test_connection")
 }

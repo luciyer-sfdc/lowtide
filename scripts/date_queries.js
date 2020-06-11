@@ -77,7 +77,37 @@ const testInsertDataflowBranch = () => {
 
 }
 
+const testInsertDataflowBranches = () => {
+
+  const request_body = [
+    { id: "0Fb3h0000004kjLCAQ" },
+    { id: "0Fb3h0000004kjPCAQ", date: "2020-01-30" },
+    { id: "0Fb3h0000004kjQCAQ" },
+    { id: "0Fb3h0000004kjOCAQ" },
+    { id: "0Fb3h0000004kjNCAQ" }
+  ]
+
+  auth.testing.getConnection()
+    .then(conn => {
+
+      timeshift.dataflow
+        .timeshiftApp(conn, request_body)
+        .then(result => {
+          result.forEach(d => {
+              console.log(d.value.output_name)
+              console.log(d.value.last_processed)
+              console.log(d.value.fields)
+          })
+        })
+        .catch(console.error)
+
+    })
+    .catch(console.error)
+
+}
+
 //testGetFolderDatasets()
 //testGetDateValues()
 //testGenerateBranch()
-testInsertDataflowBranch()
+//testInsertDataflowBranch()
+testInsertDataflowBranches()

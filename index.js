@@ -276,38 +276,20 @@ app.get(config.routes.dataflow.list, (req, res) => {
 
 })
 
-app.post(config.routes.dataflow.base, async (req, res) => {
+app.post(config.routes.dataflow.base, (req, res) => {
 
-  if (!util.bodyHasField(req, "source_app_id"))
+  if (!util.bodyHasField(req, "dataset_array"))
     return res.status(500).json({
-      "message" : "Request body requires source_app_id."
+      "message" : "Request body requires dataset_array."
     })
-
-  const app_id = req.body.source_dataset_id,
-        user_date = null;
-
-  if (!util.bodyHasField(req, "user_timeshift_date")) {
-    // Run queries, generate suggested date
-
-
-  } else {
-    user_date = req.body.user_timeshift_date
-  }
 
   const conn = auth.getStoredConnection(req.session)
 
-  timeshift.dataflow.generate(ds_id, user_date)
-    .then(ts_dataflow => {
+  timeshift.dataflow.timeshiftApp(conn, req.body.dataset_array)
+    .then(promise_array => {
 
-      timeshift.dataflow.create(conn, ts_dataflow)
-        .then(result => {
-          console.log(result)
-          res.status(200).json(result)
-        })
-        .catch(error => {
-          console.error(error.message)
-          res.status(500).json(error.message)
-        })
+      console.log(promise_array)
+      res.status(200).json(promise_array)
 
     })
     .catch(error => {
