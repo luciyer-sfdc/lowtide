@@ -114,7 +114,15 @@
 }
 ```
 
-Will return an object containing a deploy job id.
+Returns:
+
+```
+{
+  "done": true,
+  "id": "0Af3h000006hYB3CAM",
+  "state": "Completed"
+}
+```
 
 #### Check Deploy Status
 
@@ -125,4 +133,31 @@ Will return an object containing a deploy job id.
 
 ### Dataflows
 
-_WIP_
+#### Org Dataflows
+
+`GET` `/api/dataflow`
+
+#### Timeshift Array of Datasets
+
+`POST` `/api/dataflow`
+
+```
+{
+  "dataset_array" : [
+    { "id" : "xxx" },
+    { "id" : "yyy", "date" : "2020-01-01" },
+  ]
+}
+```
+
+#### Update Dataflow
+
+`PATCH` `/api/dataflow/:dataflow_id`
+
+```
+{
+  "name" : "RenamedDataflow",
+  "label" : "Updated Dataflow",
+  "definition" : {}
+}
+```
