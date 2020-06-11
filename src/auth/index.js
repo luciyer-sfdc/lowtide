@@ -8,7 +8,7 @@ const credentials = require("./credentials")
 
 const logConnectionFound = (req) => {
   console.log("Salesforce found on session:", req.sessionID)
-  console.log("SF Details:", req.session.salesforce.auth_response)
+  console.log("Salesforce Auth:", req.session.salesforce.auth_response)
   console.log("Cookie:", req.session.cookie)
 }
 
@@ -158,6 +158,12 @@ const destroyConnection = (req, res) => {
 
 }
 
+const describeSession = (req, res) => {
+  res.status(200).json({
+    "session": req.session
+  })
+}
+
 
 module.exports = {
 
@@ -170,6 +176,7 @@ module.exports = {
   routeRequest: routeRequest,
   handleOauthCallback: handleOauthCallback,
   destroyConnection: destroyConnection,
+  describeSession: describeSession,
 
   oauth: oauth,
   session: session,

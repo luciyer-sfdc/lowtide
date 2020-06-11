@@ -21,8 +21,12 @@ const CREATE_FILE = false
 
 class TemplateDeploy {
 
-  constructor(id, status, template_list) {
-
+  constructor(job_id, job_status, message, template_list) {
+    this.timestamp = new Date()
+    this.jobId = job_id
+    this.jobStatus = job_status
+    this.message = message
+    this.templateList = template_list
   }
 
 }
@@ -81,27 +85,36 @@ exports.fromRepository = (conn, template_list) => {
 
   let deploy = conn.metadata.deploy(archive, DEFAULT_DEPLOY_OPTIONS)
 
-  deploy.complete(true, (error, result) => {
-    if (!error) {
-      console.log("Id:", result.id)
-      console.log("Status:", result.status)
-      console.log("Details:", result.details)
-      return result
-    } return error
-  })
-
   return new Promise((resolve, reject) => {
+
+    deploy.complete(true, (error, result) => {
+      if (!error) {
+        console.log(result)
+        resolve(result)
+      } else {
+        console.error(error)
+        reject(error)
+      }
+    })
+
     deploy
       .on("progress", (output) => {
-          console.log("Progress:", output)
-          resolve(output)
+        console.log(output)
+        resolve(output)
       })
-      .on("complete", logTime)
+      .on("complete", (output) => {
+        console.log(output)
+        resolve(output)
+      })
       .on("error", (error) => {
-        console.error("Error:", error)
+        console.error(error)
         reject(error)
       })
+
   })
 
+}
 
+exports.getDeployStatus = (conn, job_id) => {
+  return conn.metadata.checkDeployStatus(job_id, true)
 }

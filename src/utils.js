@@ -3,6 +3,10 @@ require("dotenv").config()
 const fs = require("fs")
 const path = require("path")
 
+const getTimestamp = () => {
+  return new Date().toLocaleTimeString()
+}
+
 exports.bodyHasField = (req, field_name) => {
   return (
     !req.body[field_name] &&
@@ -10,8 +14,17 @@ exports.bodyHasField = (req, field_name) => {
   )
 }
 
-exports.timestamp = () => {
-  return new Date().toLocaleTimeString()
+exports.logRequest = (req, res, next) => {
+  console.log(`[${getTimestamp()}]: (${req.method}) "${req.originalUrl}"`)
+  next()
+}
+
+exports.onStart = () => {
+  console.log(`[${getTimestamp()}]: Server running.`)
+}
+
+exports.databaseConnected = () => {
+  console.log(`[${getTimestamp()}]: Connected to database.`)
 }
 
 exports.logAuth = (conn, userInfo) => {

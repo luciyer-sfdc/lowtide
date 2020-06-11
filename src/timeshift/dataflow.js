@@ -90,7 +90,7 @@ const generateAppTimeshiftDataflow = (conn, ts_array) => {
 
 }
 
-exports.timeshiftApp = (conn, dataset_array) => {
+exports.timeshiftDatasets = (conn, dataset_array) => {
   return generateAppTimeshiftDataflow(conn, dataset_array)
 }
 
