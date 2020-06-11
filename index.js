@@ -61,92 +61,11 @@ app.all(config.routes.all, (req, res, next) => {
 
 /* AUTH */
 
-app.all(config.routes.auth.required, (req, res, next) => {
-
-  if (!auth.foundConnection(req.session) && !auth.isAuthenticating(req))
-    return res.status(500).json({
-      message: "Not authenticated with Salesforce. Please GET /api/auth."
-    })
-
-  next()
-
-})
-
-app.get(config.routes.auth.request, (req, res) => {
-
-  if (auth.foundConnection(req.session)) {
-
-    console.log("Salesforce found on session:", req.sessionID)
-    console.log("SF Details:", req.session.salesforce.authResponse)
-    console.log("Cookie:", req.session.cookie)
-
-    res.status(200).json({
-      message: `Authenticated with: ${req.session.salesforce.authResponse.instanceUrl}`
-    })
-
-  }
-
-  else {
-
-    console.log("No Salesforce session found. Initializing...")
-
-    if (req.get("source") === "session") {
-
-      auth.session.store(req)
-        .then(sf => {
-          req.session.salesforce = sf
-          res.sendStatus(200)
-        })
-        .catch(console.error)
-
-    } else {
-      res.redirect(auth.oauth2.getUrl())
-    }
-
-  }
-
-})
-
-app.get(config.routes.auth.callback, (req, res, next) => {
-
-  auth.oauth2.store(req)
-    .then(sf => {
-      req.session.salesforce = sf
-
-      console.log("Redirecting to Homepage.")
-      res.redirect("/")
-
-    })
-    .catch(error => {
-      console.error(error)
-      res.status(500).json(error.message)
-    })
-
-})
-
-app.get(config.routes.auth.revoke, (req, res) => {
-
-  const conn = auth.getStoredConnection(req.session)
-
-  if (req.session.salesforce.type === "oauth2") {
-    conn.logoutByOAuth2(() => {
-      req.session.destroy(() => {
-        res.status(200).json({ message: "Logout successful." })
-      })
-    }).catch(error => {
-      res.status(500).json(error)
-    })
-  } else if (req.session.salesforce.type === "session") {
-    conn.logout(() => {
-      req.session.destroy(() => {
-        res.status(200).json({ message: "Logout successful." })
-      })
-    }).catch(error => {
-      res.status(500).json(error)
-    })
-  }
-
-})
+app.all(config.routes.auth.required, (req, res, next) => auth.handleAuthRequired(req, res, next))
+app.get(config.routes.auth.request, (req, res) => auth.visitedAuth(req, res))
+app.post(config.routes.auth.request, (req, res) => auth.routeRequest(req, res))
+app.get(config.routes.auth.callback, (req, res) => auth.handleOauthCallback(req, res))
+app.get(config.routes.auth.revoke, (req, res) => auth.destroyConnection(req, res))
 
 /* HOME */
 
@@ -158,7 +77,7 @@ app.get("/", (req, res) => {
 
 app.get("/api/test", (req, res) => {
 
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   template.deploy.fromRepository(conn, template_list)
     .then(prog => {
@@ -180,7 +99,7 @@ app.get("/api/status", (req, res) => {
 
 app.get(config.routes.org.list, (req, res) => {
 
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   conn.request(process.env.API_ENDPOINT + "templates")
     .then(result => {
@@ -196,7 +115,7 @@ app.get(config.routes.org.list, (req, res) => {
 app.get(config.routes.org.base + "/:template_id", (req, res) => {
 
   const tid = req.params.template_id
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   conn.request(process.env.API_ENDPOINT + "templates/" + tid)
     .then(result => {
@@ -212,7 +131,7 @@ app.get(config.routes.org.base + "/:template_id", (req, res) => {
 app.delete(config.routes.org.base + "/:template_id", (req, res) => {
 
   const tid = req.params.template_id
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   conn.requestDelete(process.env.API_ENDPOINT + "templates/" + tid)
     .then(result => {
@@ -235,7 +154,7 @@ app.get(config.routes.repository.list, (req, res) => {
 
 app.post(config.routes.repository.deploy, (req, res) => {
 
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   console.log("Deploy Attempt:", req.body.templates)=
 
@@ -261,7 +180,7 @@ app.get(config.routes.repository.download + "/:template_name", (req, res) => {
 
 app.get(config.routes.dataflow.list, (req, res) => {
 
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   timeshift.dataflow.list(conn)
     .then(result => {
@@ -283,7 +202,7 @@ app.post(config.routes.dataflow.base, (req, res) => {
       "message" : "Request body requires dataset_array."
     })
 
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   timeshift.dataflow.timeshiftApp(conn, req.body.dataset_array)
     .then(promise_array => {
@@ -301,7 +220,7 @@ app.post(config.routes.dataflow.base, (req, res) => {
 
 app.get(config.routes.dataflow.base + "/:dataflow_id", (req, res) => {
 
-  const conn = auth.getStoredConnection(req.session)
+  const conn = auth.refreshConnection(req.session)
 
   const dfid = req.params.dataflow_id
 

@@ -4,36 +4,39 @@ const jsforce = require("jsforce")
 
 exports.store = (req) => {
 
-  console.log("Authorizing with Username and Password.")
+  const username = req.body.credentials.username,
+        password = req.body.credentials.password;
 
   const sf_object = {
-    type: "credentials",
-    opened: new Date(),
-    rest: process.env.API_ENDPOINT,
-    authCredentials: {
-      username: req.get("username"),
-      password: req.get("password")
-    },
-    authResponse: {}
+    auth_type: req.body.source
   }
 
   return new Promise((resolve, reject) => {
 
     const conn = new jsforce.Connection()
 
-    conn.login(
-      sf_object.authCredentials.username,
-      sf_object.authCredentials.password)
-      .then(() => {
+    conn.login(username, password, (err, _) => {
 
-        sf_object.authResponse = {
+      if (!err) {
+
+        sf_object.opened_date = new Date()
+
+        sf_object.auth_response = {
           accessToken: conn.accessToken,
           instanceUrl: conn.instanceUrl
         }
 
         resolve(sf_object)
 
-      })
+      } else {
+
+        console.error(err)
+        reject("Invalid username, password, security token; or user locked out.")
+
+      }
+
+    })
+
 
   })
 

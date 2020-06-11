@@ -4,30 +4,37 @@ const jsforce = require("jsforce")
 
 exports.store = (req) => {
 
-  console.log("Authorizing with Salesforce Session.")
+  const auth_credentials = {
+    sessionId: req.body.credentials.session_id,
+    serverUrl: req.body.credentials.server_url,
+    version: process.env.API_VERSION
+  }
 
   const sf_object = {
-    type: "session",
-    opened: new Date(),
-    rest: process.env.API_ENDPOINT,
-    authCredentials: {
-      serverUrl: req.get("server_url"),
-      sessionId: req.get("session_id"),
-      version: process.env.API_VERSION
-    },
-    authResponse: {}
+    auth_type: req.body.source
   }
 
   return new Promise((resolve, reject) => {
 
-    const conn = new jsforce.Connection(sf_object.authCredentials)
+    const conn = new jsforce.Connection(auth_credentials)
 
-    sf_object.authResponse = {
-      accessToken: conn.accessToken,
-      instanceUrl: conn.instanceUrl
-    }
+    sf_object.opened_date = new Date()
 
-    resolve(sf_object)
+    conn.identity((err, _) => {
+      if (!err) {
+
+        sf_object.auth_response = {
+          accessToken: conn.accessToken,
+          instanceUrl: conn.instanceUrl
+        }
+
+        resolve(sf_object)
+
+      } else {
+        reject("Could not authenticate with session information.")
+      }
+    })
+
 
   })
 

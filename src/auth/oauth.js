@@ -15,27 +15,21 @@ exports.getUrl = () => {
 
 exports.store = (req) => {
 
-  console.log("Authorizing with Oauth2.")
-
   const sf_object = {
-    type: "oauth2",
-    opened: new Date(),
-    rest: process.env.API_ENDPOINT,
-    authCredentials: {
-      oauth2: oauth2
-    },
-    authResponse: {}
+    auth_type: req.body.source
   }
 
   return new Promise((resolve, reject) => {
 
-    const conn = new jsforce.Connection(sf_object.authCredentials)
+    const conn = new jsforce.Connection({ oauth2: oauth2 })
 
-    conn.authorize(req.query.code, (error, userInfo) => {
+    conn.authorize(req.query.code, (err, userInfo) => {
 
-      if (!error) {
+      if (!err) {
 
-        sf_object.authResponse = {
+        sf_object.opened_date = new Date()
+
+        sf_object.auth_response = {
           accessToken: conn.accessToken,
           instanceUrl: conn.instanceUrl
         }
@@ -44,8 +38,8 @@ exports.store = (req) => {
 
       } else {
 
-        console.error(error)
-        reject(error)
+        console.error(err)
+        reject(err)
 
       }
 
