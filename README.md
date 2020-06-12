@@ -1,40 +1,12 @@
 ## Lowtide
 
----
+Tooling for Einstein Analytics Demos. Built by EA Tech PMM. 
 
-### Routes
+Contacts:
 
-```
-{
-  "all" : "*",
-  "auth" : {
-    "required" : "/api/*",
-    "request" : "/api/auth",
-    "callback" : "/api/auth/callback",
-    "revoke" : "/api/auth/revoke",
-    "session" : "/api/auth/session"
-  },
-  "org" : {
-    "base" : "/api/org/template",
-    "single" : "/api/org/template/:template_id",
-    "download" : "/api/org/template/:template_id/download"
-  },
-  "repository" : {
-    "base" : "/api/repo/template",
-    "single" : "/api/repo/template/:template_name",
-    "download" : "/api/org/template/:template_name/download",
-    "deploy" : "/api/repo/template/deploy",
-    "deploy_status" : "/api/repo/template/deploy/:deploy_id"
-  },
-  "dataflow" : {
-    "base" : "/api/dataflow",
-    "single" : "/api/dataflow/:dataflow_id",
-    "schedule" : "/api/dataflow/:dataflow_id/schedule",
-    "run" : "/api/dataflow/:dataflow_id/run"
-  },
-  "upload" : {}
-}
-```
+Luc Iyer (luciyer@salesforce.com)
+Terrence Tse (ttse@salesforce.com)
+Rodrigo Mercader (rmercader@salesforce.com)
 
 ---
 
