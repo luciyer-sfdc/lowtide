@@ -1,12 +1,10 @@
 ## Lowtide
 
-Tooling for Einstein Analytics Demos. Built by EA Tech PMM. 
+Tooling for Einstein Analytics Demos. Built by EA Tech PMM.
 
 Contacts:
 
-Luc Iyer (luciyer@salesforce.com)
-Terrence Tse (ttse@salesforce.com)
-Rodrigo Mercader (rmercader@salesforce.com)
+Luc Iyer (luciyer@salesforce.com), Terrence Tse (ttse@salesforce.com), Rodrigo Mercader (rmercader@salesforce.com)
 
 ---
 
@@ -32,7 +30,7 @@ Rodrigo Mercader (rmercader@salesforce.com)
 
 ```
 {
-	"source": "credentials",
+	"source": "session",
 	"credentials" : {
 		"session_id" : "my_session_id",
 		"server_url" : "https://my-org.salesforce.com"
