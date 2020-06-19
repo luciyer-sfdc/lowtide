@@ -10,7 +10,7 @@ const DEFAULT_DEPLOY_OPTIONS = {
   allowMissingFiles: false,
   autoUpdatePackage: false,
   checkOnly: false,
-  ignoreWarnings: true,
+  ignoreWarnings: false,
   performRetrieve: false,
   purgeOnDelete: false,
   rollbackOnError: true,
