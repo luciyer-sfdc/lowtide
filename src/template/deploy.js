@@ -8,7 +8,7 @@ const package = require("./package")
 
 const DEFAULT_DEPLOY_OPTIONS = {
   allowMissingFiles: false,
-  autoUpdatePackage: false,
+  autoUpdatePackage: true,
   checkOnly: false,
   ignoreWarnings: false,
   performRetrieve: false,
