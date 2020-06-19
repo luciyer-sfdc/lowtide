@@ -19,18 +19,6 @@ const DEFAULT_DEPLOY_OPTIONS = {
 
 const CREATE_FILE = false
 
-class TemplateDeploy {
-
-  constructor(job_id, job_status, message, template_list) {
-    this.timestamp = new Date()
-    this.jobId = job_id
-    this.jobStatus = job_status
-    this.message = message
-    this.templateList = template_list
-  }
-
-}
-
 const logTime = (message) => {
   console.log(new Date().toLocaleTimeString() + ":", message)
 }
@@ -40,6 +28,8 @@ exports.streamDownload = (template_name) => {
 }
 
 exports.fromRepository = (conn, template_list) => {
+
+  console.log("Deploy:" template_list)
 
   const archive = archiver("zip")
 
