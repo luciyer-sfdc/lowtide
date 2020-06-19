@@ -29,7 +29,7 @@ exports.streamDownload = (template_name) => {
 
 exports.fromRepository = (conn, template_list) => {
 
-  console.log("Deploy:" template_list)
+  console.log("Deploy:", template_list)
 
   const archive = archiver("zip")
 
