@@ -33,8 +33,7 @@ exports.fromRepository = (conn, template_list) => {
 
   const archive = archiver("zip")
 
-  const cwd = path.join(__dirname, '..'),
-        template_directory = cwd + process.env.TEMPLATE_DIR;
+  const template_directory = appRoot + process.env.TEMPLATE_DIR
 
   const package_directory = "pkg/",
         package_file = package_directory + "package.xml",
@@ -42,8 +41,8 @@ exports.fromRepository = (conn, template_list) => {
 
   // FOR DEBUG PURPOSES - to inspect archive structure
   if (CREATE_FILE) {
-    const staging_directory = cwd + process.env.STAGING_DIR
-    const output = fs.createWriteStream(staging_directory + "/package.zip")
+    const staging_directory = appRoot + process.env.STAGING_DIR
+    const output = fs.createWriteStream(staging_directory + "package.zip")
     archive.pipe(output)
   }
 
@@ -58,6 +57,7 @@ exports.fromRepository = (conn, template_list) => {
   archive.append(package.generateXML(), { name: package_file })
 
   template_list.forEach((template) => {
+    console.log("Adding:", package_templates + template)
     archive.directory(
       template_directory + template,
       package_templates + template
