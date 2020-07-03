@@ -34,10 +34,12 @@ exports.fromRepository = (conn, template_list) => {
   const archive = archiver("zip")
 
   const template_directory = appRoot + process.env.TEMPLATE_DIR
+  const static_directory = appRoot + process.env.STATIC_DIR
 
   const package_directory = "pkg/",
         package_file = package_directory + "package.xml",
-        package_templates = package_directory + "waveTemplates/";
+        package_templates = package_directory + "waveTemplates/",
+        static_resources = package_directory + "staticresources/";
 
   // FOR DEBUG PURPOSES - to inspect archive structure
   if (CREATE_FILE) {
@@ -55,6 +57,8 @@ exports.fromRepository = (conn, template_list) => {
   })
 
   archive.append(package.generateXML(), { name: package_file })
+
+  archive.directory(static_directory, static_resources)
 
   template_list.forEach((template) => {
     console.log("Adding:", package_templates + template)

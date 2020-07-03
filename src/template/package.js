@@ -5,10 +5,14 @@ exports.generateXML = () => create({
   }, {
     Package: {
       "@xmlns": "http://soap.sforce.com/2006/04/metadata",
-      types: {
+      types: [{
         members: "*",
         name: "WaveTemplateBundle"
       },
+      {
+          members: "*",
+          name: "StaticResource"
+      }],
       version: "48.0"
     }
 }).end({ prettyPrint: true })
