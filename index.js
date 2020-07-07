@@ -78,6 +78,10 @@ app.post(config.routes.repository.deploy, template.deployTemplates)
 app.get(config.routes.repository.deploy_status, template.getDeployStatus)
 app.get(config.routes.repository.download, template.streamDownload)
 
+/* Timeshifting */
+
+app.get(config.routes.dataset.base, timeshift.getOrgFoldersAndDatasets)
+
 /* DATAFLOW */
 
 app.get(config.routes.dataflow.base, timeshift.getOrgDataflows)

@@ -10,7 +10,7 @@ const dateToString = (d) => {
 
 const getDateFields = (conn, ds_id) => {
 
-  const dataset_endpoint = config.endpoints.dataset + ds_id
+  const dataset_endpoint = config.endpoints.datasets + ds_id
 
   return conn.request(dataset_endpoint)
     .then(response => {

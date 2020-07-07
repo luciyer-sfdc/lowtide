@@ -1,7 +1,28 @@
 
 const auth = require(appRoot + "/src/auth"),
       util = require(appRoot + "/src/utils"),
-      dataflow = require("./dataflow");
+      dataflow = require("./dataflow"),
+      datasets = require("./datasets");
+
+
+
+const getOrgFoldersAndDatasets = (req, res) => {
+
+  const conn = auth.refreshConnection(req.session)
+  const all_folders = null
+
+  datasets.getFoldersAndDatasets(conn)
+    .then(result => {
+      console.log(result)
+      res.status(200).json(result)
+    })
+    .catch(error => {
+      console.error(error.message)
+      res.status(500).json(error.message)
+    })
+
+}
+
 
 const getOrgDataflows = (req, res) => {
 
@@ -64,6 +85,7 @@ const updateDataflow = (req, res) => {
 
 module.exports = {
 
+  getOrgFoldersAndDatasets: getOrgFoldersAndDatasets,
   getOrgDataflows: getOrgDataflows,
   timeshiftDatasetArray: timeshiftDatasetArray,
   updateDataflow: updateDataflow,

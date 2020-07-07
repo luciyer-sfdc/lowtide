@@ -19,6 +19,9 @@
     "deploy" : "/api/repo/template/deploy",
     "deploy_status" : "/api/repo/template/deploy/:deploy_id"
   },
+  "dataset" : {
+    "base": "/api/dataset"
+  },
   "dataflow" : {
     "base" : "/api/dataflow",
     "single" : "/api/dataflow/:dataflow_id",
