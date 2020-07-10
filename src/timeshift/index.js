@@ -48,7 +48,7 @@ const timeshiftDatasetArray = (req, res) => {
 
   const conn = auth.refreshConnection(req.session)
 
-  dataflow.timeshiftDatasets(conn, req.body.dataset_array)
+  dataflow.timeshiftDatasets(conn, req.body.dataflow_name, req.body.dataset_array)
     .then(promise_array => {
 
       console.log(promise_array)

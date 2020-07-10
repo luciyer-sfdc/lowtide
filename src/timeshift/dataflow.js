@@ -69,7 +69,7 @@ const getDatasetBranch = (conn, dataset_id, latest_date) => {
 
 }
 
-const generateAppTimeshiftDataflow = async (conn, ts_array) => {
+const generateAppTimeshiftDataflow = async (conn, df_name, ts_array) => {
 
   const defn = {};
 
@@ -83,13 +83,13 @@ const generateAppTimeshiftDataflow = async (conn, ts_array) => {
 
   console.log(defn)
 
-  return create(conn, "testing0709", JSON.stringify(defn))
+  return create(conn, df_name, JSON.stringify(defn))
 
 
 }
 
-exports.timeshiftDatasets = (conn, dataset_array) => {
-  return generateAppTimeshiftDataflow(conn, dataset_array)
+exports.timeshiftDatasets = (conn, dataflow_name, dataset_array) => {
+  return generateAppTimeshiftDataflow(conn, dataflow_name, dataset_array)
 }
 
 exports.generateBranch = (conn, dataset_id, latest_date) => {
