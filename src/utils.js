@@ -9,7 +9,7 @@ const getTimestamp = () => {
 
 exports.bodyHasField = (req, field_name) => {
   return (
-    !req.body[field_name] &&
+    req.body[field_name] &&
     req.body[field_name] !== ""
   )
 }

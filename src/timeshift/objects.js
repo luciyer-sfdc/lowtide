@@ -17,6 +17,20 @@ class LatestDateQuery {
 
 }
 
+class FolderQuery {
+
+  constructor() {
+    this.fields = ["Id", "Name", "DeveloperName"]
+    this.object = "Folder"
+    this.filter = "WHERE Type = \'Insights\'"
+  }
+
+  get as_string() {
+    return `SELECT ${this.fields.join(", ")} FROM ${this.object} ${this.filter}`
+  }
+
+}
+
 class EdgemartQuery {
 
   constructor(folder_id) {
@@ -34,7 +48,7 @@ class EdgemartQuery {
 
   }
 
-  get as_string () {
+  get as_string() {
     return `SELECT ${this.fields.join(", ")} FROM ${this.object} ${this.filter}`
   }
 
@@ -70,6 +84,7 @@ class DataflowVersionSObject {
 
 module.exports = {
   LatestDateQuery: LatestDateQuery,
+  FolderQuery: FolderQuery,
   EdgemartQuery: EdgemartQuery,
   DataflowJobPayload: DataflowJobPayload,
   DataflowSObject: DataflowSObject,

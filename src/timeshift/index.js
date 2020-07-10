@@ -9,9 +9,8 @@ const auth = require(appRoot + "/src/auth"),
 const getOrgFoldersAndDatasets = (req, res) => {
 
   const conn = auth.refreshConnection(req.session)
-  const all_folders = null
 
-  datasets.getFoldersAndDatasets(conn)
+  datasets.getDatasets(conn)
     .then(result => {
       console.log(result)
       res.status(200).json(result)

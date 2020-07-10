@@ -113,6 +113,7 @@ Returns:
 
 ```
 {
+	"dataflow_name" : "app_shifted",
   "dataset_array" : [
     { "id" : "xxx" },
     { "id" : "yyy", "date" : "2020-01-01" },

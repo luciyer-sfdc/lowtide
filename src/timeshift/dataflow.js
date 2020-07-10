@@ -69,23 +69,21 @@ const getDatasetBranch = (conn, dataset_id, latest_date) => {
 
 }
 
-const generateAppTimeshiftDataflow = (conn, ts_array) => {
+const generateAppTimeshiftDataflow = async (conn, ts_array) => {
 
-  /*
-  ts_array = [
-    { id: xxx, date: yyyy-mm-dd },
-    { id: xxx, date: yyyy-mm-dd }
-  ]
-  */
+  const defn = {};
 
-  return Promise.allSettled(ts_array.map(dataset => {
-
-    if (dataset.date)
+  const branches = await Promise.allSettled(
+    ts_array.map(dataset => {
       return getDatasetBranch(conn, dataset.id, dataset.date)
-    else
-      return getDatasetBranch(conn, dataset.id)
+    })
+  )
 
-  }))
+  branches.forEach(b => Object.assign(defn, b.value.object))
+
+  console.log(defn)
+
+  return create(conn, "testing0709", JSON.stringify(defn))
 
 
 }
@@ -108,7 +106,7 @@ exports.list = (conn) => {
 
 }
 
-exports.create = (conn, name, defn) => {
+const create = (conn, name, defn) => {
 
   const df_object = new DataflowSObject(name)
 
