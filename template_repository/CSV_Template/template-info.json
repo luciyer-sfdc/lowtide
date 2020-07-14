@@ -17,7 +17,7 @@
     }
   ],
   "releaseInfo": {
-    "templateVersion": "1.1",
+    "templateVersion": "1.0",
     "notesFile": "releaseNotes.html"
   },
   "folderDefinition": "folder.json",
