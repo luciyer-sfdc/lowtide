@@ -1,6 +1,7 @@
 require("dotenv").config()
 
 const jsforce = require("jsforce")
+const getVersion = require("./api_version")
 
 exports.store = (req) => {
 
@@ -20,8 +21,10 @@ exports.store = (req) => {
 
     sf_object.opened_date = new Date()
 
-    conn.identity((err, _) => {
+    conn.identity(async (err, _) => {
       if (!err) {
+
+        sf_object.api = await getVersion(conn)
 
         sf_object.auth_response = {
           accessToken: conn.accessToken,

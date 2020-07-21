@@ -1,0 +1,10 @@
+{
+
+  "wave_folders" : "wave/folders",
+  "wave_dataflows" : "wave/dataflows",
+  "wave_dataflowjobs" : "wave/dataflowjobs",
+  "wave_datasets" : "wave/datasets",
+  "wave_templates" : "wave/templates",
+  "wave_query" : "wave/query"
+
+}

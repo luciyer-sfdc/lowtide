@@ -52,47 +52,68 @@ app.listen(process.env.PORT || 8080, util.onStart)
 
 /* LOG REQUESTS */
 
-app.all(config.routes.all, util.logRequest)
+app.route(config.ltApi("all"))
+  .all(util.logRequest)
 
 /* AUTH */
 
-app.all(config.routes.auth.required, auth.handleAuthRequired)
-app.get(config.routes.auth.request, auth.visitedAuth)
-app.post(config.routes.auth.request, auth.routeRequest)
-app.get(config.routes.auth.callback, auth.handleOauthCallback)
-app.get(config.routes.auth.revoke, auth.destroyConnection)
-app.get(config.routes.auth.session, auth.describeSession)
+app.route(config.ltApi("auth_required"))
+  .all(auth.handleAuthRequired)
 
-/* TEMPLATES */
+app.route(config.ltApi("auth_request"))
+  .get(auth.visitedAuth)
+  .post(auth.routeRequest)
 
-/* Org */
+app.route(config.ltApi("auth_callback"))
+  .get(auth.handleOauthCallback)
 
-app.get(config.routes.org.base, template.getOrgTemplates)
-app.get(config.routes.org.single, template.getSingleOrgTemplate)
-app.delete(config.routes.org.single, template.deleteSingleOrgTemplate)
+app.route(config.ltApi("auth_revoke"))
+  .get(auth.destroyConnection)
 
-/* Repository */
+app.route(config.ltApi("auth_session"))
+  .get(auth.describeSession)
+
+/* ORG TEMPLATES, DATASETS, DATAFLOWS */
+
+app.route(config.ltApi("org_templates"))
+  .get(template.getOrgTemplates)
+
+app.route(config.ltApi("org_template_single"))
+  .get(template.getSingleOrgTemplate)
+  .delete(template.deleteSingleOrgTemplate)
+
+app.route(config.ltApi("org_datasets"))
+  .get(timeshift.getOrgFoldersAndDatasets)
+
+app.route(config.ltApi("org_dataflows"))
+  .get(timeshift.getOrgDataflows)
+  .post(timeshift.timeshiftDatasetArray)
+
+app.route(config.ltApi("repo_templates"))
+  .get(template.getRepositoryTemplates)
+  .post(template.deployTemplates)
+
+app.route(config.ltApi("repo_template_deploy_status"))
+  .get(template.getDeployStatus)
+
+app.get("/", (_, res) => res.sendStatus(200))
+
+/*
 
 app.get(config.routes.repository.base, template.getRepositoryTemplates)
-app.post(config.routes.repository.deploy, template.deployTemplates)
+app.post(config.routes.repository.base, template.deployTemplates)
 app.get(config.routes.repository.deploy_status, template.getDeployStatus)
 app.get(config.routes.repository.download, template.streamDownload)
 
-/* Timeshifting */
+
 
 app.get(config.routes.dataset.base, timeshift.getOrgFoldersAndDatasets)
 
-/* DATAFLOW */
+
 
 app.get(config.routes.dataflow.base, timeshift.getOrgDataflows)
 app.post(config.routes.dataflow.base, timeshift.timeshiftDatasetArray)
 app.patch(config.routes.dataflow.single, timeshift.updateDataflow)
 
 
-/* DOWNLOAD & UPLOAD OPERATIONS */
-
-//Hold
-
-/* HOME */
-
-app.get("/", (_, res) => res.sendStatus(200))
+*/

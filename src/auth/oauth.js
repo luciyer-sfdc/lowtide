@@ -2,11 +2,12 @@ require("dotenv").config()
 
 const jsforce = require("jsforce")
 const config = require(appRoot + "/config")
+const getVersion = require("./api_version")
 
 const oauth2 = new jsforce.OAuth2({
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  redirectUri: process.env.BASE_URL + config.routes.auth.callback
+  redirectUri: process.env.BASE_URL + config.ltApi("auth_callback")
 })
 
 exports.getUrl = () => {
@@ -23,12 +24,14 @@ exports.store = (req) => {
 
     const conn = new jsforce.Connection({ oauth2: oauth2 })
 
-    conn.authorize(req.query.code, (err, userInfo) => {
+
+
+    conn.authorize(req.query.code, async (err, userInfo) => {
 
       if (!err) {
 
         sf_object.opened_date = new Date()
-
+        sf_object.api = await getVersion(conn)
         sf_object.auth_response = {
           accessToken: conn.accessToken,
           instanceUrl: conn.instanceUrl

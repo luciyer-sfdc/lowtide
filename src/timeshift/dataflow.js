@@ -11,9 +11,6 @@ const {
   DataflowJobPayload
 } = require("./objects")
 
-const df_endpoint = config.endpoints.dataflows,
-      dfjob_endpoint = config.endpoints.dataflowjobs;
-
 const createDfVersion = (conn, df_id, defn) => {
 
   const df_version_object = new DataflowVersionSObject(df_id, defn)
@@ -100,11 +97,14 @@ exports.amendDataflow = () => {
   //Implement: fix LPD after first run
 }
 
-exports.list = (conn) => {
 
+exports.list = (conn, session) => {
+
+  const df_endpoint = config.sfApi(session, "wave_dataflows")
   return conn.request(df_endpoint)
 
 }
+
 
 const create = (conn, name, defn) => {
 
@@ -157,8 +157,10 @@ exports.update = (conn, dataflow_id, defn) => {
 
 }
 
-exports.run = (conn, dataflow_id) => {
 
+exports.run = (conn, session, dataflow_id) => {
+
+  const dfjob_endpoint = config.sfApi(session, "wave_dataflowjobs")
   const job_payload = new DataflowJobPayload(dataflow_id)
 
   return conn.requestPost(dfjob_endpoint, job_payload)
@@ -167,6 +169,7 @@ exports.run = (conn, dataflow_id) => {
 
 exports.status = (conn, dataflow_job_id) => {
 
+  const dfjob_endpoint = config.sfApi(session, "wave_dataflowjobs")
   return conn.request(dfjob_endpoint + dataflow_job_id)
 
 }

@@ -4,7 +4,7 @@ const fs = require("fs")
 const path = require("path")
 const archiver = require("archiver")
 
-const package = require("./package")
+const manifest = require("./manifest")
 
 const DEFAULT_DEPLOY_OPTIONS = {
   allowMissingFiles: false,
@@ -17,65 +17,125 @@ const DEFAULT_DEPLOY_OPTIONS = {
   singlePackage: false
 }
 
-const CREATE_FILE = false
+const CREATE_FILE = true
 
 const logTime = (message) => {
   console.log(new Date().toLocaleTimeString() + ":", message)
 }
 
-exports.streamDownload = (template_name) => {
+exports.streamDownload = (req, res, template_list) => {
+
   //TODO
 }
 
-exports.fromRepository = (conn, template_list) => {
+const makeArchive = (api_version, template_directory, template_list) => {
 
-  console.log("Deploy:", template_list)
+  console.log("Packaging:", template_list)
+
+  const local = {
+    static: appRoot + process.env.STATIC_DIR,
+    debug: appRoot + process.env.DEBUG_DIR,
+    templates: template_directory
+  }
+
+  const package = {
+    file: "package.zip",
+    manifest: "pkg/package.xml",
+    templates: "pkg/waveTemplates/",
+    static_resources: "pkg/staticresources/"
+  }
+
+  return new Promise((resolve, reject) => {
+
+    const archive = archiver("zip")
+
+    archive.on("error", (error) => {
+      console.error(error)
+      reject(error)
+    })
+
+    archive.on("finish", () => {
+      console.log(`Archive created (${archive.pointer()} bytes).`)
+      resolve(archive)
+    })
+
+
+    if (CREATE_FILE)
+      archive.pipe(fs.createWriteStream(local.debug + package.file))
+
+    // Append package.xml manifest
+    archive.append(manifest.generate(api_version), { name: package.manifest })
+
+    // Append static resources
+    archive.directory(local.static, package.static_resources)
+
+    // Add analytics app templates
+    template_list.forEach((template) => {
+      archive.directory(
+        local.templates + template,
+        package.templates + template)
+    })
+
+    archive.finalize()
+
+  })
+
+}
+
+exports.fromRepository = async (conn, api_version, template_directory, template_list) => {
+
+  console.log("Packaging:", template_list)
+
+  const local = {
+    static: appRoot + process.env.STATIC_DIR,
+    debug: appRoot + process.env.DEBUG_DIR,
+    templates: template_directory
+  }
+
+  const package = {
+    file: "package.zip",
+    manifest: "pkg/package.xml",
+    templates: "pkg/waveTemplates/",
+    static_resources: "pkg/staticresources/"
+  }
+
 
   const archive = archiver("zip")
 
-  const template_directory = appRoot + process.env.TEMPLATE_DIR
-  const static_directory = appRoot + process.env.STATIC_DIR
-
-  const package_directory = "pkg/",
-        package_file = package_directory + "package.xml",
-        package_templates = package_directory + "waveTemplates/",
-        static_resources = package_directory + "staticresources/";
-
-  // FOR DEBUG PURPOSES - to inspect archive structure
-  if (CREATE_FILE) {
-    const staging_directory = appRoot + process.env.STAGING_DIR
-    const output = fs.createWriteStream(staging_directory + "package.zip")
-    archive.pipe(output)
-  }
-
-  archive.on("error", (err) => {
-    return console.error(err)
+  archive.on("error", (error) => {
+    console.error(error)
   })
 
-  archive.on("end", () => {
-    console.log("Pointer size:", archive.pointer(), "bytes.")
+  archive.on("finish", () => {
+    console.log(`Archive created (${archive.pointer()} bytes).`)
   })
 
-  archive.append(package.generateXML(), { name: package_file })
 
-  archive.directory(static_directory, static_resources)
+  if (CREATE_FILE)
+    archive.pipe(fs.createWriteStream(local.debug + package.file))
 
+  // Append package.xml manifest
+  archive.append(manifest.generate(api_version), { name: package.manifest })
+
+  // Append static resources
+  archive.directory(local.static, package.static_resources)
+
+  // Add analytics app templates
   template_list.forEach((template) => {
-    console.log("Adding:", package_templates + template)
     archive.directory(
-      template_directory + template,
-      package_templates + template
-    )
+      local.templates + template,
+      package.templates + template)
   })
 
   archive.finalize()
 
-  logTime("Starting deploy to " + conn.instanceUrl)
+
+  logTime("Uploading to " + conn.instanceUrl)
 
   const start_time = Date.now()
 
   conn.metadata.pollInterval = 1 * 1000
-  conn.metadata.pollTimeout = 60 * 1000
+  conn.metadata.pollTimeout = 600 * 1000
 
   let deploy = conn.metadata.deploy(archive, DEFAULT_DEPLOY_OPTIONS)
 

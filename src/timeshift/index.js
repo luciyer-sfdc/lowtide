@@ -5,7 +5,6 @@ const auth = require(appRoot + "/src/auth"),
       datasets = require("./datasets");
 
 
-
 const getOrgFoldersAndDatasets = (req, res) => {
 
   const conn = auth.refreshConnection(req.session)
@@ -27,7 +26,7 @@ const getOrgDataflows = (req, res) => {
 
   const conn = auth.refreshConnection(req.session)
 
-  dataflow.list(conn)
+  dataflow.list(conn, req.session)
     .then(result => {
       console.log(result)
       res.status(200).json(result)

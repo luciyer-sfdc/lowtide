@@ -1,46 +1,21 @@
-const sf = require("./salesforce")
+const path = require("path")
 
-const base = sf.rest.base_url,
-      api = sf.rest.api_version,
-      dir = sf.rest.subdirectory,
-      fld = sf.folder,
-      df = sf.dataflow,
-      dfj = sf.dataflowjob,
-      ds = sf.dataset,
-      qr = sf.query;
+const lt_api = require("./lowtide_api")
+const sf_api = require("./salesforce_api")
+const sf_rest = require("./salesforce_rest")
 
-const wave = (function () {
-  return `${base}${api}${dir}`
-})();
+const generateSfApiEndpoint = (session, endpoint) => {
+  const base_url = session.salesforce.api.url
+  const generated_path = path.join(base_url, sf_api[endpoint])
+  return path.normalize(generated_path)
+}
 
-const folders = (function () {
-  return `${wave}${fld}`
-})();
-
-const dataflows = (function () {
-  return `${wave}${df}`
-})();
-
-const dataflowjobs = (function () {
-  return `${wave}${dfj}`
-})();
-
-const datasets = (function () {
-  return `${wave}${ds}`
-})();
-
-const query = (function () {
-  return `${wave}${qr}`
-})();
+const generateLtApiEndpoint = (endpoint) => {
+  return lt_api[endpoint]
+}
 
 module.exports = {
-  routes: require("./routes"),
-  endpoints: {
-    wave: wave,
-    folders: folders,
-    dataflows: dataflows,
-    dataflowjobs: dataflowjobs,
-    datasets: datasets,
-    query: query
-  }
+  sf_rest,
+  ltApi: generateLtApiEndpoint,
+  sfApi: generateSfApiEndpoint,
 }

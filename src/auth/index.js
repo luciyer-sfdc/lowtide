@@ -5,6 +5,7 @@ const config = require(appRoot + "/config")
 const oauth = require("./oauth")
 const session = require("./session")
 const credentials = require("./credentials")
+const getVersion = require("./api_version")
 
 const logConnectionFound = (req) => {
   console.log("Salesforce found on session:", req.sessionID)
@@ -18,9 +19,9 @@ const logNoConnectionFound = () => {
 
 const isAuthEndpoint = (req) => {
   return (
-    req.path === config.routes.auth.request ||
-    req.path === config.routes.auth.callback ||
-    req.path === config.routes.auth.revoke
+    req.path === config.ltApi("auth_request") ||
+    req.path === config.ltApi("auth_callback") ||
+    req.path === config.ltApi("auth_revoke")
   )
 }
 
@@ -180,7 +181,6 @@ module.exports = {
 
   oauth: oauth,
   session: session,
-  credentials: credentials,
-  testing: require("./test_connection")
+  credentials: credentials
 
 }

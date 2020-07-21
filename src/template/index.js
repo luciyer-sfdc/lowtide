@@ -6,6 +6,16 @@ const fs = require("fs"),
 const auth = require(appRoot + "/src/auth")
 const deploy = require("./deploy")
 
+const getBranchFolder = (branch) => {
+
+  const template_branch = branch === "beta"
+    ? process.env.TEMPLATES_BETA
+    : process.env.TEMPLATES_MASTER;
+
+  return appRoot + template_branch
+
+}
+
 const getOrgTemplates = (req, res) => {
 
   const conn = auth.refreshConnection(req.session)
@@ -55,10 +65,23 @@ const deleteSingleOrgTemplate = (req, res) => {
 
 const getRepositoryTemplates = (req, res) => {
 
-  const template_directory = appRoot + process.env.TEMPLATE_DIR
+  const template_directory = getBranchFolder(req.params.branch)
+  const org_api = parseInt(req.session.salesforce.api.version)
+
+  let getTemplateInfo = (template) => {
+    const info_filepath = `${template_directory}${template}/template-info.json`
+    const data = JSON.parse(fs.readFileSync(info_filepath))
+    const is_deployable = data.assetVersion <= org_api
+    return {
+      label: data.label,
+      api_name: data.name,
+      api_version: data.assetVersion,
+      deployable: is_deployable
+    }
+  }
 
   try {
-    const template_list = fs.readdirSync(template_directory)
+    const template_list = fs.readdirSync(template_directory).map(getTemplateInfo)
     res.status(200).json(template_list)
   } catch (error) {
     res.status(500).json(error)
@@ -69,9 +92,11 @@ const getRepositoryTemplates = (req, res) => {
 const deployTemplates = (req, res) => {
 
   const conn = auth.refreshConnection(req.session),
+        version = req.session.salesforce.api.version,
+        template_directory = getBranchFolder(req.params.branch),
         template_list = req.body.templates;
 
-  deploy.fromRepository(conn, template_list)
+  deploy.fromRepository(conn, version, template_directory, template_list)
     .then(result => {
       res.status(200).json(result)
     })
@@ -118,5 +143,5 @@ module.exports = {
   streamDownload: streamDownload,
 
   deploy: deploy,
-  package: require("./package")
+  manifest: require("./manifest")
 }
