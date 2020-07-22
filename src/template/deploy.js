@@ -135,7 +135,7 @@ exports.fromRepository = async (conn, api_version, template_directory, template_
   const start_time = Date.now()
 
   conn.metadata.pollInterval = 1 * 1000
-  conn.metadata.pollTimeout = 600 * 1000
+  conn.metadata.pollTimeout = 60 * 1000
 
   let deploy = conn.metadata.deploy(archive, DEFAULT_DEPLOY_OPTIONS)
 
