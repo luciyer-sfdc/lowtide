@@ -17,7 +17,7 @@ const DEFAULT_DEPLOY_OPTIONS = {
   singlePackage: false
 }
 
-const CREATE_FILE = true
+const CREATE_FILE = false
 
 const logTime = (message) => {
   console.log(new Date().toLocaleTimeString() + ":", message)
