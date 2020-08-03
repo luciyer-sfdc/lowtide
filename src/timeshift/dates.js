@@ -8,19 +8,27 @@ const dateToString = (d) => {
   return `${d.getUTCFullYear()}-${mm}-${dd}`;
 }
 
-const getDateFields = (conn, ds_id) => {
+const getDateFields = (conn, session, ds_id) => {
 
-  const dataset_endpoint = config.endpoints.datasets + ds_id
+  const dataset_endpoint = config.sfApi(session, "wave_datasets") + "/" + ds_id
 
   return conn.request(dataset_endpoint)
     .then(response => {
 
       return conn.request(response.currentVersionUrl)
         .then(response => {
+
+          let dataset_name;
+
+          if (response.xmdMain.dataset.connector === "CSV")
+            dataset_name = response.xmdMain.dataset.fullyQualifiedName.slice(0, -4)
+          else
+            dataset_name = response.xmdMain.dataset.fullyQualifiedName
+
           return {
             dataset_id: response.dataset.id,
             version_id: response.id,
-            dataset_name: response.xmdMain.dataset.fullyQualifiedName,
+            dataset_name: dataset_name,
             date_fields: response.xmdMain.dates
           }
         })
@@ -37,13 +45,13 @@ const getDateFields = (conn, ds_id) => {
 }
 
 
-const executeQuery = (conn, dataset_info, field_info) => {
+const executeQuery = (conn, session, dataset_info, field_info) => {
 
   const query_object = new LatestDateQuery(
     dataset_info.dataset_id, dataset_info.version_id, field_info.fields.fullField
   )
 
-  return conn.requestPost(config.endpoints.query, query_object.query)
+  return conn.requestPost(config.sfApi(session, "wave_query"), query_object.query)
     .then(response => {
       if (response.results.records[0].__Latest_YMD !== undefined)
         return {
@@ -58,10 +66,10 @@ const executeQuery = (conn, dataset_info, field_info) => {
 
 }
 
-const getDateValues = (conn, dataset_info) => {
+const getDateValues = (conn, session, dataset_info) => {
 
   return Promise.allSettled(dataset_info.date_fields.map(field_info => {
-    return executeQuery(conn, dataset_info, field_info)
+    return executeQuery(conn, session, dataset_info, field_info)
   }))
 
 }

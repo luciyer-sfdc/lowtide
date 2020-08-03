@@ -32,17 +32,17 @@ const updateDfCurrentId = (conn, df_id, df_vid) => {
 
 }
 
-const getDatasetBranch = (conn, dataset_id, latest_date) => {
+const getDatasetBranch = (conn, session, dataset_id, latest_date) => {
 
   const branch_settings = {}
 
-  return dates.getDateFields(conn, dataset_id)
+  return dates.getDateFields(conn, session, dataset_id)
     .then(dataset => {
 
       branch_settings.input_ds = dataset.dataset_name;
       branch_settings.output_ds = dataset.dataset_name + "_shifted";
 
-      return dates.getDateValues(conn, dataset)
+      return dates.getDateValues(conn, session, dataset)
         .then(query_results => {
 
           const parsed_results = dates.parseResults(query_results)
@@ -66,15 +66,17 @@ const getDatasetBranch = (conn, dataset_id, latest_date) => {
 
 }
 
-const generateAppTimeshiftDataflow = async (conn, df_name, ts_array) => {
+const generateAppTimeshiftDataflow = async (conn, session, df_name, ts_array) => {
 
   const defn = {};
 
   const branches = await Promise.allSettled(
     ts_array.map(dataset => {
-      return getDatasetBranch(conn, dataset.id, dataset.date)
+      return getDatasetBranch(conn, session, dataset.id, dataset.date)
     })
   )
+
+  console.log(branches)
 
   branches.forEach(b => Object.assign(defn, b.value.object))
 
@@ -85,8 +87,8 @@ const generateAppTimeshiftDataflow = async (conn, df_name, ts_array) => {
 
 }
 
-exports.timeshiftDatasets = (conn, dataflow_name, dataset_array) => {
-  return generateAppTimeshiftDataflow(conn, dataflow_name, dataset_array)
+exports.timeshiftDatasets = (conn, session, dataflow_name, dataset_array) => {
+  return generateAppTimeshiftDataflow(conn, session, dataflow_name, dataset_array)
 }
 
 exports.generateBranch = (conn, dataset_id, latest_date) => {
