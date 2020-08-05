@@ -89,6 +89,9 @@ app.route(config.ltApi("org_dataflows"))
   .get(timeshift.getOrgDataflows)
   .post(timeshift.timeshiftDatasetArray)
 
+app.route(config.ltApi("org_dataflows_overwrite"))
+  .post(timeshift.overwriteDataflow)
+
 app.route(config.ltApi("repo_templates"))
   .get(template.getRepositoryTemplates)
   .post(template.deployTemplates)

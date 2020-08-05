@@ -61,6 +61,24 @@ const timeshiftDatasetArray = (req, res) => {
 
 }
 
+const overwriteDataflow = (req, res) => {
+
+  const conn = auth.refreshConnection(req.session)
+
+  dataflow.overwriteDataflow(conn, req.session, req.body.dataflow_id, req.body.dataset_array)
+    .then(promise_array => {
+
+      console.log(promise_array)
+      res.status(200).json(promise_array)
+
+    })
+    .catch(error => {
+      console.error(error.message)
+      res.status(500).json(error.message)
+    })
+
+}
+
 const updateDataflow = (req, res) => {
 
   const conn = auth.refreshConnection(req.session)
@@ -86,6 +104,7 @@ module.exports = {
   getOrgFoldersAndDatasets: getOrgFoldersAndDatasets,
   getOrgDataflows: getOrgDataflows,
   timeshiftDatasetArray: timeshiftDatasetArray,
+  overwriteDataflow: overwriteDataflow,
   updateDataflow: updateDataflow,
 
   dataflow: dataflow,
