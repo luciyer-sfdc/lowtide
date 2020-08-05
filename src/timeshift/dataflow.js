@@ -76,7 +76,11 @@ const generateAppTimeshiftDataflow = async (conn, session, df_name, ts_array) =>
     })
   )
 
-  branches.forEach(b => Object.assign(defn, b.value.object))
+  branches.forEach(b => {
+    Object.assign(defn, b.value.object)
+  })
+
+  console.log("Definition:", JSON.stringify(defn))
 
   return create(conn, df_name, JSON.stringify(defn))
 
@@ -106,8 +110,18 @@ exports.overwriteDataflow = async (conn, session, df_id, ts_array) => {
 
 }
 
-exports.amendDataflow = () => {
-  //Implement: fix LPD after first run
+exports.amendDataflow = (conn, session, dataset_id) => {
+
+  //Fix LPD after first run
+
+  // get Dataflow & parse to object
+
+  // Confirm LPD field exists
+
+  // replace static values with LPD field
+
+
+
 }
 
 
@@ -151,6 +165,7 @@ const create = (conn, name, defn) => {
     .catch(console.error)
 
 }
+
 
 const update = (conn, dataflow_id, defn) => {
 
