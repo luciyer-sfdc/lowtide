@@ -15,15 +15,10 @@ const getDateFields = (conn, session, ds_id) => {
   return conn.request(dataset_endpoint)
     .then(response => {
 
+      const dataset_name = response.name
+
       return conn.request(response.currentVersionUrl)
         .then(response => {
-
-          let dataset_name;
-
-          if (response.xmdMain.dataset.connector === "CSV")
-            dataset_name = response.xmdMain.dataset.fullyQualifiedName.slice(0, -4)
-          else
-            dataset_name = response.xmdMain.dataset.fullyQualifiedName
 
           return {
             dataset_id: response.dataset.id,
