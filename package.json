@@ -12,6 +12,7 @@
   "author": "Luc Iyer <luciyer@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "agenda": "^3.1.0",
     "archiver": "^4.0.1",
     "archiver-promise": "^1.0.0",
     "aws-sdk": "^2.724.0",
@@ -24,6 +25,7 @@
     "github-download": "^0.5.0",
     "jsforce": "^1.9.3",
     "minimist": "^1.2.5",
+    "mongodb": "^3.6.0",
     "mongoose": "^5.9.15",
     "ncp": "^2.0.0",
     "shortid": "^2.2.15",

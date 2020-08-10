@@ -1,9 +1,9 @@
 
 const auth = require(appRoot + "/src/auth"),
       util = require(appRoot + "/src/utils"),
+      agenda = require(appRoot + "/src/agenda")
       dataflow = require("./dataflow"),
       datasets = require("./datasets");
-
 
 const getOrgFoldersAndDatasets = (req, res) => {
 
@@ -37,6 +37,8 @@ const getOrgDataflows = (req, res) => {
     })
 
 }
+
+const timeshiftTest = dataflow.timeshiftDatasets
 
 const timeshiftDatasetArray = (req, res) => {
 
@@ -101,13 +103,15 @@ const updateDataflow = (req, res) => {
 
 module.exports = {
 
+  timeshiftTest: timeshiftTest,
+  
   getOrgFoldersAndDatasets: getOrgFoldersAndDatasets,
   getOrgDataflows: getOrgDataflows,
   timeshiftDatasetArray: timeshiftDatasetArray,
   overwriteDataflow: overwriteDataflow,
   updateDataflow: updateDataflow,
 
-  dataflow: dataflow,
+  dataflow: require("./dataflow"),
   dataset: require("./datasets"),
   models: require("./objects"),
   dates: require("./dates")

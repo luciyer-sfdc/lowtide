@@ -1,10 +1,12 @@
 const jsforce = require("jsforce")
 
 const config = require(appRoot + "/config")
+
 const dates = require("./dates")
 const dataset = require("./datasets")
 
 const { Branch } = require("./definition")
+
 const {
   DataflowSObject,
   DataflowVersionSObject,
@@ -29,6 +31,44 @@ const updateDfCurrentId = (conn, df_id, df_vid) => {
       Id: df_id,
       CurrentId: df_vid
     })
+
+}
+
+const generateDatasetBranch = async (conn, session, params) => {
+
+  const { dataset_id, latest_date } = params
+
+  let getDateValue = (d) => { return d.value }
+
+  const dataset = await dates.getDateFields(conn, session, dataset_id)
+  const date_query_results = await dates.getDateValues(conn, session, dataset)
+  const parsed_results = dates.parseResults(date_query_results)
+  const date_fields = parsed_results.dates_found.map(getDateValue)
+  const valid_timeshift = dates.validateDateFields(date_fields)
+
+  if (valid_timeshift !== true) {
+
+    console.error(valid_timeshift)
+    return
+
+  } else {
+
+    const branch_settings = {
+      input_ds: dataset.dataset_name,
+      output_ds: dataset.dataset_name,
+      date_fields: date_fields,
+    }
+
+    if (latest_date)
+      branch_settings.lp_date = latest_date
+    else
+      branch_settings.lp_date = parsed_results.suggested_date
+
+    console.log(`Branch Settings (${dataset_id}):`, branch_settings)
+
+    return new Branch(branch_settings)
+
+  }
 
 }
 
@@ -66,49 +106,50 @@ const getDatasetBranch = (conn, session, dataset_id, latest_date) => {
 
 }
 
-const generateAppTimeshiftDataflow = async (conn, session, df_name, ts_array) => {
+exports.timeshiftDatasets = async (conn, session, df_params, ts_array) => {
 
-  const defn = {};
+  console.log("Generating timeshift dataflow...")
+
+  let assignToSingleObject = (branches) => {
+    const def = {}
+    for (const b of branches) {
+      if (b.value)
+        Object.assign(def, b.value.object)
+    } return def
+  }
 
   const branches = await Promise.allSettled(
     ts_array.map(dataset => {
-      return getDatasetBranch(conn, session, dataset.id, dataset.date)
+      console.log(`Generating Branch for ${dataset.id}`)
+      try {
+        return generateDatasetBranch(conn, session, {
+          dataset_id: dataset.id,
+          latest_date: dataset.date
+        })
+      } catch (e) {
+        console.error(e.message)
+      }
     })
   )
 
-  branches.forEach(b => {
-    Object.assign(defn, b.value.object)
-  })
+  const df_definition = assignToSingleObject(branches),
+        df_definition_str = JSON.stringify(df_definition);
 
-  console.log("Definition:", JSON.stringify(defn))
+  /* Create net new dataflow providing @name, @label */
+  if (df_params.operation === "create") {
+    return create(conn, df_params.name, df_params.label, df_definition_str)
+  }
+  /* Overwrite existing dataflow definition providing @id */
+  else if (df_params.operation === "overwrite") {
+    return update(conn, df_params.id, df_definition_str)
+  }
 
-  return create(conn, df_name, JSON.stringify(defn))
-
-}
-
-exports.timeshiftDatasets = (conn, session, dataflow_name, dataset_array) => {
-  return generateAppTimeshiftDataflow(conn, session, dataflow_name, dataset_array)
 }
 
 exports.generateBranch = (conn, dataset_id, latest_date) => {
   return getDatasetBranch(conn, dataset_id, latest_date)
 }
 
-exports.overwriteDataflow = async (conn, session, df_id, ts_array) => {
-
-  const defn = {};
-
-  const branches = await Promise.allSettled(
-    ts_array.map(dataset => {
-      return getDatasetBranch(conn, session, dataset.id, dataset.date)
-    })
-  )
-
-  branches.forEach(b => Object.assign(defn, b.value.object))
-
-  return update(conn, df_id, JSON.stringify(defn))
-
-}
 
 exports.amendDataflow = (conn, session, dataset_id) => {
 
@@ -133,9 +174,9 @@ exports.list = (conn, session) => {
 }
 
 
-const create = (conn, name, defn) => {
+const create = (conn, name, label, defn) => {
 
-  const df_object = new DataflowSObject(name)
+  const df_object = new DataflowSObject(name, label)
 
   console.log("Creating Dataflow \"" + name + "\"")
 
@@ -154,7 +195,6 @@ const create = (conn, name, defn) => {
           console.log("Updating Dataflow CurrentId to Version Id...")
 
           return updateDfCurrentId(conn, df.id, dfv.id)
-
 
         })
         .catch(err => {

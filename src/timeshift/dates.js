@@ -8,6 +8,22 @@ const dateToString = (d) => {
   return `${d.getUTCFullYear()}-${mm}-${dd}`;
 }
 
+const getApiName = (d) => { return d.api_name }
+
+const validateDateFields = (field_list) => {
+
+  console.log("Validating Date Fields...")
+
+  if (!field_list || field_list.length === 0)
+    return "No Date Fields Founds"
+
+  if (field_list.map(getApiName).includes("LastProcessedDate"))
+    return "Found LastProcessedDate"
+
+  return true
+
+}
+
 const getDateFields = (conn, session, ds_id) => {
 
   const dataset_endpoint = config.sfApi(session, "wave_datasets") + "/" + ds_id
@@ -84,6 +100,7 @@ const parseResults = (result_array) => {
 }
 
 module.exports = {
+  validateDateFields: validateDateFields,
   getDateFields: getDateFields,
   getDateValues: getDateValues,
   parseResults: parseResults

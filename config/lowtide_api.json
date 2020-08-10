@@ -27,6 +27,8 @@
   "repo_templates" : "/api/repository/template/:branch",
   "repo_template_single" : "/api/repository/template/:branch/:template_name",
   "repo_template_download" : "/api/repository/template/:branch/download/:template_name",
-  "repo_template_deploy_status" : "/api/repository/template/deploy/status/:deploy_id"
+  "repo_template_deploy_status" : "/api/repository/template/deploy/status/:deploy_id",
+
+  "job_status" : "/api/jobs/:job_id"
 
 }

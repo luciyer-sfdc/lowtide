@@ -65,9 +65,9 @@ class DataflowJobPayload {
 
 class DataflowSObject {
 
-  constructor(dev_name) {
+  constructor(dev_name, master_label) {
     this.DeveloperName = dev_name
-    this.MasterLabel = dev_name
+    this.MasterLabel = master_label
     this.State = "Active"
   }
 

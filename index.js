@@ -17,7 +17,10 @@ const config = require("./config"),
       auth = require("./src/auth"),
       template = require("./src/template"),
       timeshift = require("./src/timeshift"),
-      util = require("./src/utils");
+      util = require("./src/utils"),
+      agenda = require("./src/agenda"),
+      router = require("./src/router");
+
 
 const db_uri = process.env.MONGODB_URI || "mongodb://localhost/dev"
 
@@ -48,7 +51,10 @@ app
     saveUninitialized: true
   }))
 
-app.listen(process.env.PORT || 8080, util.onStart)
+app.listen(process.env.PORT || 8080, async () => {
+  await agenda.start()
+  util.onStart()
+})
 
 /* LOG REQUESTS */
 
@@ -86,8 +92,8 @@ app.route(config.ltApi("org_datasets"))
   .get(timeshift.getOrgFoldersAndDatasets)
 
 app.route(config.ltApi("org_dataflows"))
-  .get(timeshift.getOrgDataflows)
-  .post(timeshift.timeshiftDatasetArray)
+  .get(router.timeshift.getOrgDataflows)
+  .post(router.timeshift.generateDataflow)
 
 app.route(config.ltApi("org_dataflows_overwrite"))
   .post(timeshift.overwriteDataflow)
@@ -98,6 +104,9 @@ app.route(config.ltApi("repo_templates"))
 
 app.route(config.ltApi("repo_template_deploy_status"))
   .get(template.getDeployStatus)
+
+app.route(config.ltApi("job_status"))
+  .get(router.jobs.getStatus)
 
 app.get("/", (_, res) => res.sendStatus(200))
 
