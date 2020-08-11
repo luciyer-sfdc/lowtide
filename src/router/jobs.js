@@ -1,28 +1,35 @@
-const agenda = require(appRoot + "/src/agenda")
 const ObjectId = require("mongodb").ObjectID
+
+const agenda = require(appRoot + "/src/agenda")
+
+const formatResponse = (job) => {
+  return {
+    name: job.attrs.name,
+    org: job.attrs.data.session.salesforce.auth_response.instanceUrl,
+    run_at: job.attrs.lastRunAt,
+    done_at: job.attrs.lastFinishedAt,
+    result: job.attrs.job_result
+  }
+}
 
 exports.getStatus = async (req, res) => {
 
-  console.log("Check status of job:", req.params.job_id)
+  const job_id = req.params.job_id
+
+  console.log("Check status of job:", job_id)
 
   try {
 
-    let found_job,
-        filter = { _id: new ObjectId(req.params.job_id) },
-        job_list = await agenda.jobs(filter)
+    const filter = { _id: new ObjectId(job_id) },
+          job_list = await agenda.jobs(filter);
 
-    if (job_list && job_list.length > 0)
-      found_job = job_list[0]
-
-    const response_object = {
-      name: found_job.attrs.name,
-      request_org: found_job.attrs.data.session.salesforce.auth_response.instanceUrl,
-      run: found_job.attrs.lastRunAt,
-      finished: found_job.attrs.lastFinishedAt,
-      result: found_job.attrs.job_result
+    if (job_list && job_list.length > 0) {
+      const result = formatResponse(job_list[0])
+      console.log("Job status:", result)
+      res.status(200).json(result)
+    } else {
+      return res.status(500).json("No job found with that ID.")
     }
-
-    res.status(200).json(response_object)
 
   } catch (e) {
     console.error(e.message)
@@ -30,3 +37,7 @@ exports.getStatus = async (req, res) => {
   }
 
 }
+
+exports.recentJobs = async (req, res) => {}
+
+exports.pendingJobs = async (req, res) => {}

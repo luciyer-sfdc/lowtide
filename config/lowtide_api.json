@@ -11,16 +11,19 @@
 
   "org" : "/api/org/*",
 
+  "org_folders" : "/api/org/folder",
+
+  "org_datasets" : "/api/org/dataset",
+  "org_datasets_folder" : "/api/org/dataset/:folder_id",
+
+  "org_dataflows" : "/api/org/dataflow",
+  "org_dataflows_folder" : "/api/org/dataflow/:folder_id",
+  "org_dataflow_single" : "/api/org/dataflow/single/:dataflow_id",
+
   "org_templates" : "/api/org/template",
   "org_template_single" : "/api/org/template/:template_id",
   "org_template_download" : "/api/org/template/:template_id/download",
   "org_template_upload" : "/api/org/template/upload",
-  "org_datasets" : "/api/org/dataset",
-  "org_dataflows" : "/api/org/dataflow",
-  "org_dataflows_overwrite" : "/api/org/dataflow/overwrite",
-  "org_dataflow_single" : "/api/org/dataflow/:dataflow_id",
-  "org_dataflow_run" : "/api/org/dataflow/run/:dataflow_id",
-  "org_dataflow_schedule" : "/api/org/dataflow/schedule/:dataflow_id",
 
   "repo" : "/api/repository/*",
 

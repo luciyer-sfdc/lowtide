@@ -16,7 +16,6 @@ const MongoStore = require("connect-mongo")(session)
 const config = require("./config"),
       auth = require("./src/auth"),
       template = require("./src/template"),
-      timeshift = require("./src/timeshift"),
       util = require("./src/utils"),
       agenda = require("./src/agenda"),
       router = require("./src/router");
@@ -81,22 +80,31 @@ app.route(config.ltApi("auth_session"))
 
 /* ORG TEMPLATES, DATASETS, DATAFLOWS */
 
-app.route(config.ltApi("org_templates"))
-  .get(template.getOrgTemplates)
-
-app.route(config.ltApi("org_template_single"))
-  .get(template.getSingleOrgTemplate)
-  .delete(template.deleteSingleOrgTemplate)
+app.route(config.ltApi("org_folders"))
+  .get(router.org.getOrgFolders)
 
 app.route(config.ltApi("org_datasets"))
-  .get(timeshift.getOrgFoldersAndDatasets)
+  .get(router.org.getOrgDatasets)
+
+app.route(config.ltApi("org_datasets_folder"))
+  .get(router.org.getOrgDatasets)
 
 app.route(config.ltApi("org_dataflows"))
-  .get(router.timeshift.getOrgDataflows)
+  .get(router.org.getOrgDataflows)
   .post(router.timeshift.generateDataflow)
 
-app.route(config.ltApi("org_dataflows_overwrite"))
-  .post(timeshift.overwriteDataflow)
+app.route(config.ltApi("org_dataflows_folder"))
+  .get(router.org.getOrgDataflows)
+
+app.route(config.ltApi("org_dataflow_single"))
+  .get(router.org.getCurrentDataflowVersion)
+
+app.route(config.ltApi("org_templates"))
+  .get(router.org.getOrgTemplates)
+
+app.route(config.ltApi("org_template_single"))
+  .get(router.org.getSingleOrgTemplate)
+  .delete(router.org.deleteSingleOrgTemplate)
 
 app.route(config.ltApi("repo_templates"))
   .get(template.getRepositoryTemplates)
@@ -109,23 +117,3 @@ app.route(config.ltApi("job_status"))
   .get(router.jobs.getStatus)
 
 app.get("/", (_, res) => res.sendStatus(200))
-
-/*
-
-app.get(config.routes.repository.base, template.getRepositoryTemplates)
-app.post(config.routes.repository.base, template.deployTemplates)
-app.get(config.routes.repository.deploy_status, template.getDeployStatus)
-app.get(config.routes.repository.download, template.streamDownload)
-
-
-
-app.get(config.routes.dataset.base, timeshift.getOrgFoldersAndDatasets)
-
-
-
-app.get(config.routes.dataflow.base, timeshift.getOrgDataflows)
-app.post(config.routes.dataflow.base, timeshift.timeshiftDatasetArray)
-app.patch(config.routes.dataflow.single, timeshift.updateDataflow)
-
-
-*/

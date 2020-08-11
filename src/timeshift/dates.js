@@ -1,6 +1,23 @@
-
 const config = require(appRoot + "/config")
-const { LatestDateQuery } = require("./objects")
+
+class LatestDateQuery {
+
+  constructor(dataset_id, dataset_version_id, field) {
+    this.field = field;
+    this.load = `q = load \"${dataset_id}/${dataset_version_id}\";`;
+    this.foreach = `q = foreach q generate '${field}_Year' + \"-\" + '${field}_Month' + \"-\" + '${field}_Day' as '__Latest_YMD', count() as 'count';`;
+    this.order = `q = order q by '__Latest_YMD' desc;`;
+    this.limit = `q = limit q 1;`;
+
+    this.query = { "query" : `${this.load} ${this.foreach} ${this.order} ${this.limit}` };
+
+  }
+
+  get json() {
+    return JSON.stringify(this.query);
+  }
+
+}
 
 const dateToString = (d) => {
   var mm = d.getUTCMonth() < 10 ? `0${d.getUTCMonth() + 1}` : d.getUTCMonth();
@@ -55,11 +72,12 @@ const getDateFields = (conn, session, ds_id) => {
 
 }
 
-
 const executeQuery = (conn, session, dataset_info, field_info) => {
 
   const query_object = new LatestDateQuery(
-    dataset_info.dataset_id, dataset_info.version_id, field_info.fields.fullField
+    dataset_info.dataset_id,
+    dataset_info.version_id,
+    field_info.fields.fullField
   )
 
   return conn.requestPost(config.sfApi(session, "wave_query"), query_object.query)

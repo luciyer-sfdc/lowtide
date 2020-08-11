@@ -1,6 +1,4 @@
 const agenda = require(appRoot + "/src/agenda")
-const auth = require(appRoot + "/src/auth")
-const timeshift = require(appRoot + "/src/timeshift")
 
 const validation = require("./validation")
 
@@ -25,16 +23,6 @@ exports.generateDataflow = async (req, res) => {
 
 }
 
-exports.getOrgDataflows = async (req, res) => {
-
-  const conn = auth.refreshConnection(req.session)
-
-  try {
-    const result = await dataflow.list(conn, req.session)
-    res.status(200).json(result)
-  } catch (e) {
-    console.error(e.message)
-    res.status(500).json(e.message)
-  }
+exports.amendDataflow = async (req, res) => {
 
 }

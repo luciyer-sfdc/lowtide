@@ -7,10 +7,14 @@ const session = require("./session")
 const credentials = require("./credentials")
 const getVersion = require("./api_version")
 
+const VERBOSE = false
+
 const logConnectionFound = (req) => {
   console.log("Salesforce found on session:", req.sessionID)
-  console.log("Salesforce Auth:", req.session.salesforce.auth_response)
-  console.log("Cookie:", req.session.cookie)
+  if (VERBOSE) {
+    console.log("Salesforce Auth:", req.session.salesforce.auth_response)
+    console.log("Cookie:", req.session.cookie)
+  }
 }
 
 const logNoConnectionFound = () => {

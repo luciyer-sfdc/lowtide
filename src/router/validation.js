@@ -24,3 +24,6 @@ exports.validDataflowOperation = (req) => {
   return (has_params && (valid_create || valid_overwrite))
 
 }
+
+exports.objectHas = objectHas
+exports.matchValue = matchValue

@@ -16,53 +16,6 @@ const getBranchFolder = (branch) => {
 
 }
 
-const getOrgTemplates = (req, res) => {
-
-  const conn = auth.refreshConnection(req.session)
-
-  conn.request(process.env.API_ENDPOINT + "templates")
-    .then(result => {
-      res.status(200).json(result)
-    })
-    .catch(error => {
-      console.error(error)
-      res.status(500).json(error)
-    })
-
-}
-
-const getSingleOrgTemplate = (req, res) => {
-
-  const tid = req.params.template_id
-  const conn = auth.refreshConnection(req.session)
-
-  conn.request(process.env.API_ENDPOINT + "templates/" + tid)
-    .then(result => {
-      res.status(200).json(result)
-    })
-    .catch(error => {
-      console.error(error)
-      res.status(500).json(error)
-    })
-
-}
-
-const deleteSingleOrgTemplate = (req, res) => {
-
-  const tid = req.params.template_id
-  const conn = auth.refreshConnection(req.session)
-
-  conn.requestDelete(process.env.API_ENDPOINT + "templates/" + tid)
-    .then(result => {
-      res.status(200).json(result)
-    })
-    .catch(error => {
-      console.error(error)
-      res.status(500).json(error)
-    })
-
-}
-
 const getRepositoryTemplates = (req, res) => {
 
   const template_directory = getBranchFolder(req.params.branch)
@@ -132,10 +85,6 @@ const streamDownload = (req, res) => {
 }
 
 module.exports = {
-
-  getOrgTemplates: getOrgTemplates,
-  getSingleOrgTemplate: getSingleOrgTemplate,
-  deleteSingleOrgTemplate: deleteSingleOrgTemplate,
 
   getRepositoryTemplates: getRepositoryTemplates,
   deployTemplates: deployTemplates,
