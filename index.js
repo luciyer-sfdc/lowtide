@@ -15,11 +15,9 @@ const MongoStore = require("connect-mongo")(session)
 
 const config = require("./config"),
       auth = require("./src/auth"),
-      template = require("./src/template"),
       util = require("./src/utils"),
       agenda = require("./src/agenda"),
       router = require("./src/router");
-
 
 const db_uri = process.env.MONGODB_URI || "mongodb://localhost/dev"
 
@@ -78,7 +76,7 @@ app.route(config.ltApi("auth_revoke"))
 app.route(config.ltApi("auth_session"))
   .get(auth.describeSession)
 
-/* ORG TEMPLATES, DATASETS, DATAFLOWS */
+/* ORG FOLDERS, DATASETS, DATAFLOWS, TEMPLATES */
 
 app.route(config.ltApi("org_folders"))
   .get(router.org.getOrgFolders)
@@ -88,6 +86,9 @@ app.route(config.ltApi("org_datasets"))
 
 app.route(config.ltApi("org_datasets_folder"))
   .get(router.org.getOrgDatasets)
+
+app.route(config.ltApi("org_datasets_refresh"))
+  .get(router.org.refreshDatasets)
 
 app.route(config.ltApi("org_dataflows"))
   .get(router.org.getOrgDataflows)
@@ -101,17 +102,22 @@ app.route(config.ltApi("org_dataflow_single"))
 
 app.route(config.ltApi("org_templates"))
   .get(router.org.getOrgTemplates)
+  .post(router.org.createTemplateFromApp)
+  .patch(router.org.updateTemplateFromApp)
 
 app.route(config.ltApi("org_template_single"))
   .get(router.org.getSingleOrgTemplate)
   .delete(router.org.deleteSingleOrgTemplate)
 
-app.route(config.ltApi("repo_templates"))
-  .get(template.getRepositoryTemplates)
-  .post(template.deployTemplates)
+/* SERVER REPOSITORY: TEMPLATES */
 
-app.route(config.ltApi("repo_template_deploy_status"))
-  .get(template.getDeployStatus)
+app.route(config.ltApi("repo_templates"))
+  .get(router.repo.getTemplates)
+
+app.route(config.ltApi("repo_template_deploy"))
+  .post(router.repo.deployTemplates)
+
+/* ASYNC JOB QUEUE */
 
 app.route(config.ltApi("job_status"))
   .get(router.jobs.getStatus)

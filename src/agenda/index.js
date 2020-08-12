@@ -15,24 +15,6 @@ const connection_options = {
 
 const queue = new Agenda(connection_options)
 
-/*
-
-  JOB TEMPLATE
-
-  queue.define("job_name", async job => {
-
-    // run async job and capture result
-
-    const job_result = await jobs.some_job()
-    job.attrs.job_result = job_result
-
-    // optionally - hit some endpoint that client listens to
-
-  })
-
-
-*/
-
 queue.define("timeshift_datasets", async job => {
 
   console.log("Running job timeshift_datasets...")
@@ -47,8 +29,46 @@ queue.define("timeshift_datasets", async job => {
 
 })
 
-queue.define("asd", async job => {
-  console.log("qwe")
+queue.define("refresh_datasets", async job => {
+
+  console.log("Running job refresh_datasets...")
+
+  const session = job.attrs.data
+
+  const job_result = await jobs.refreshDatasets(session)
+
+  console.log("Finished job refresh_datasets.")
+
+  job.attrs.job_result = job_result
+
+})
+
+queue.define("check_refresh_status", async job => {
+
+    console.log("Running job check_refresh_status...")
+
+    const session = job.attrs.data
+
+    const job_result = await jobs.checkRefresh(session)
+
+    console.log("Finished job check_refresh_status.")
+
+    job.attrs.job_result = job_result
+
+})
+
+queue.define("deploy_templates", async job => {
+
+    console.log("Running job deploy_templates...")
+
+    const params = job.attrs.data
+
+    const job_result = await jobs.deployTemplates(params)
+
+    console.log("Finished job deploy_templates.")
+
+    job.attrs.job_result = job_result
+
 })
 
 module.exports = queue

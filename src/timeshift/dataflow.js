@@ -18,12 +18,7 @@ const generateDatasetBranch = async (conn, session, params) => {
   const date_fields = parsed_results.dates_found.map(getDateValue)
   const valid_timeshift = dates.validateDateFields(date_fields)
 
-  if (valid_timeshift !== true) {
-
-    console.error(valid_timeshift)
-    return
-
-  } else {
+  if (typeof valid_timeshift !== "string") {
 
     const branch_settings = {
       input_ds: dataset.dataset_name,
@@ -40,6 +35,8 @@ const generateDatasetBranch = async (conn, session, params) => {
 
     return new Branch(branch_settings)
 
+  } else {
+    throw new Error(valid_timeshift)
   }
 
 }
@@ -56,51 +53,123 @@ exports.timeshiftDatasets = async (conn, session, df_params, ts_array) => {
     } return def
   }
 
-  const branches = await Promise.allSettled(
+  const results = await Promise.allSettled(
     ts_array.map(dataset => {
-      console.log(`Generating Branch for ${dataset.id}`)
-      try {
-        return generateDatasetBranch(conn, session, {
+
+      return new Promise((resolve, reject) => {
+
+        const params = {
           dataset_id: dataset.id,
           latest_date: dataset.date
-        })
-      } catch (e) {
-        console.error(e.message)
-      }
+        }
+
+        generateDatasetBranch(conn, session, params)
+          .then(branch => {
+            console.log(`Generated Branch for ${dataset.id}`)
+            resolve({
+              dataset_id: dataset.id,
+              branch: branch
+            })
+          })
+          .catch(e => {
+            console.log(`Rejecting ${dataset.id}: ${e.message}.`)
+            reject({
+              dataset_id: dataset.id,
+              error: e.message
+            })
+          })
+
+      })
+
     })
+
   )
 
-  const df_definition = assignToSingleObject(branches),
-        df_definition_str = JSON.stringify(df_definition);
+  const branches = results.filter(d => d.status === "fulfilled"),
+        errors = results.filter(d => d.status === "rejected").map(d => d.reason);
 
-  /* Create net new dataflow providing @name, @label */
+  if (branches && branches.length > 0) {
 
-  if (df_params.operation === "create") {
+    const branch_definitions = branches.map(d => d.value.branch),
+          df_definition = assignToSingleObject(branch_definitions),
+          df_definition_str = JSON.stringify(df_definition),
+          branch_results = branches.map(d => {
+            return {
+              dataset_id: d.value.dataset_id
+            }
+          });
 
-    const df = await org.createDataflow(conn, {
-      DeveloperName: df_params.name,
-      MasterLabel: df_params.label,
-      State: "Active"
-    })
+    /* Create net new dataflow providing @name, @label */
+    if (df_params.operation === "create") {
 
-    const dfv = await org.createDataflowVersion(conn, {
-      DataflowId: df.id,
-      DataflowDefinition: df_definition_str
-    })
+      try {
 
-    return await org.assignDataflowVersion(conn, df.id, dfv.id)
+        const df = await org.createDataflow(conn, {
+          DeveloperName: df_params.name,
+          MasterLabel: df_params.label,
+          State: "Active"
+        })
 
-  }
+        const dfv = await org.createDataflowVersion(conn, {
+          DataflowId: df.id,
+          DataflowDefinition: df_definition_str
+        })
 
-  /* Overwrite existing dataflow definition providing @id */
-  else if (df_params.operation === "overwrite") {
+        await org.assignDataflowVersion(conn, df.id, dfv.id)
 
-    const dfv = await org.createDataflowVersion(conn, {
-      DataflowId: df_params.id,
-      DataflowDefinition: df_definition_str
-    })
+        return {
+          success: true,
+          dataflow_id: df.id,
+          dataflow_version_id: dfv.id,
+          branches: branch_results,
+          errors: errors
+        }
 
-    return await org.assignDataflowVersion(conn, df_params.id, dfv.id)
+      } catch (e) {
+        return {
+          success: false,
+          message: e.message
+        }
+      }
+
+    }
+
+    /* Overwrite existing dataflow definition providing @id */
+    else if (df_params.operation === "overwrite") {
+
+      try {
+
+        const dfv = await org.createDataflowVersion(conn, {
+          DataflowId: df_params.id,
+          DataflowDefinition: df_definition_str
+        })
+
+        await org.assignDataflowVersion(conn, df_params.id, dfv.id)
+
+        return {
+          success: true,
+          dataflow_id: df_params.id,
+          dataflow_version_id: dfv.id,
+          branches: branch_results,
+          errors: errors
+        }
+
+      } catch (e) {
+        return {
+          success: false,
+          message: e.message
+        }
+      }
+
+    }
+
+  } else {
+
+    return {
+      success: false,
+      message: "No dataflow generated.",
+      errors: errors
+    }
 
   }
 

@@ -1,5 +1,6 @@
 const auth = require(appRoot + "/src/auth")
 const org = require(appRoot + "/src/org")
+const agenda = require(appRoot + "/src/agenda")
 
 exports.getOrgFolders = async (req, res) => {
 
@@ -89,5 +90,44 @@ exports.deleteSingleOrgTemplate = async (req, res) => {
     console.error(e)
     res.status(500).json(e.message)
   }
+
+}
+
+exports.createTemplateFromApp = async (req, res) => {
+
+  const params = {
+    session: req.session,
+    folder_id: req.body.folder_id
+  }
+
+  const template = await agenda.now("create_template", params)
+
+  res.status(200).json({
+    job_id: template.attrs._id,
+    run_at: template.attrs.nextRunAt
+  })
+
+
+}
+
+exports.updateTemplateFromApp = async (req, res) => {
+
+}
+
+exports.refreshDatasets = async (req, res) => {
+
+  const refresh = await agenda.now("refresh_datasets", req.session)
+  const confirm = await agenda.schedule("in 2 minutes", "check_refresh_status", req.session)
+
+  res.status(200).json({
+    refresh: {
+      job_id: refresh.attrs._id,
+      run_at: refresh.attrs.nextRunAt
+    },
+    confirmation: {
+      job_id: confirm.attrs._id,
+      run_at: confirm.attrs.nextRunAt
+    }
+  })
 
 }

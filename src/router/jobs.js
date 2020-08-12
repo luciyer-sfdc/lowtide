@@ -5,7 +5,6 @@ const agenda = require(appRoot + "/src/agenda")
 const formatResponse = (job) => {
   return {
     name: job.attrs.name,
-    org: job.attrs.data.session.salesforce.auth_response.instanceUrl,
     run_at: job.attrs.lastRunAt,
     done_at: job.attrs.lastFinishedAt,
     result: job.attrs.job_result

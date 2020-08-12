@@ -37,10 +37,9 @@ const foundConnection = (req) => {
     req.session.salesforce.auth_response !== undefined
   )
 
-  if (hasConnection)
-    logConnectionFound(req)
-  else
-    logNoConnectionFound()
+  hasConnection
+    ? logConnectionFound(req)
+    : logNoConnectionFound();
 
   return hasConnection
 

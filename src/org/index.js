@@ -5,6 +5,8 @@ from the User's org.
 
 */
 
+const config = require(appRoot + "/config")
+
 exports.getFolders = (conn) => {
   console.log("Querying org Insights Folders...")
   return conn
@@ -64,6 +66,39 @@ exports.deleteSingleTemplate = (conn, template_id) => {
   return conn
     .sobject("WaveTemplate")
     .destroy(template_id)
+}
+
+exports.createTemplate = (conn, params) => {
+
+  const { session, folder_id, dataflow_id } = params
+
+  console.log("Creating new WaveTemplate...")
+
+  const template_endpoint = config.sfApi(session, "wave_templates"),
+        request_body = { folderSource: { id: folder_id }};
+
+  if (dataflow_id)
+    request_body.dataflow = { id: dataflow_id }
+
+  return conn.requestPost(template_endpoint, request_body)
+
+}
+
+exports.updateTemplate = (conn, params) => {
+
+  const { session, template_id, folder_id, dataflow_id } = params
+
+  console.log("Updating existing WaveTemplate...")
+
+  const template_endpoint = config.sfApi(session, "wave_templates"),
+        single_template = `${template_endpoint}/${template_id}`,
+        request_body = { folderSource: { id: folder_id }};
+
+  if (dataflow_id)
+    request_body.dataflow = { id: dataflow_id }
+
+  return conn.requestPut(single_template, request_body)
+
 }
 
 exports.createDataflow = (conn, dataflow) => {

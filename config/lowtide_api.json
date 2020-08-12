@@ -15,6 +15,7 @@
 
   "org_datasets" : "/api/org/dataset",
   "org_datasets_folder" : "/api/org/dataset/:folder_id",
+  "org_datasets_refresh" : "/api/org/dataset/refresh",
 
   "org_dataflows" : "/api/org/dataflow",
   "org_dataflows_folder" : "/api/org/dataflow/:folder_id",
@@ -28,9 +29,8 @@
   "repo" : "/api/repository/*",
 
   "repo_templates" : "/api/repository/template/:branch",
-  "repo_template_single" : "/api/repository/template/:branch/:template_name",
-  "repo_template_download" : "/api/repository/template/:branch/download/:template_name",
-  "repo_template_deploy_status" : "/api/repository/template/deploy/status/:deploy_id",
+  "repo_template_deploy" : "/api/repository/template/:branch/deploy",
+  "repo_template_download" : "/api/repository/template/:branch/download",
 
   "job_status" : "/api/jobs/:job_id"
 

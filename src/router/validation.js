@@ -25,5 +25,20 @@ exports.validDataflowOperation = (req) => {
 
 }
 
+exports.validTemplateDeploy = (req) => {
+
+  const valid_branch = (
+    objectHas(req.params, "branch") &&
+    (matchValue(req.params, "branch", "beta") || matchValue(req.params, "branch", "master"))
+  )
+
+  const valid_list = (
+    objectHas(req.body, "templates") && Array.isArray(req.body.templates)
+  )
+
+  return (valid_branch && valid_list)
+
+}
+
 exports.objectHas = objectHas
 exports.matchValue = matchValue
