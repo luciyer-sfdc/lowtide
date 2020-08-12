@@ -20,7 +20,7 @@ class LatestDateQuery {
 }
 
 const dateToString = (d) => {
-  var mm = d.getUTCMonth() < 10 ? `0${d.getUTCMonth() + 1}` : d.getUTCMonth();
+  var mm = d.getUTCMonth() < 9 ? `0${d.getUTCMonth() + 1}` : d.getUTCMonth() + 1;
   var dd = d.getUTCDate() < 10 ? `0${d.getUTCDate()}` : d.getUTCDate();
   return `${d.getUTCFullYear()}-${mm}-${dd}`;
 }
@@ -32,10 +32,10 @@ const validateDateFields = (field_list) => {
   console.log("Validating Date Fields...")
 
   if (!field_list || field_list.length === 0)
-    return "No Date Fields Founds"
+    return "No date columns found."
 
   if (field_list.map(getApiName).includes("LastProcessedDate"))
-    return "Found LastProcessedDate"
+    return "Found LastProcessedDate column."
 
   return true
 
@@ -61,13 +61,13 @@ const getDateFields = (conn, session, ds_id) => {
           }
         })
         .catch(error => {
-          throw error.message
+          throw new Error(error.message)
         })
 
     })
     .catch(error => {
       console.error(error.message)
-      throw error.message
+      throw new Error(error.message)
     })
 
 }

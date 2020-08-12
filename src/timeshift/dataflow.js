@@ -41,6 +41,75 @@ const generateDatasetBranch = async (conn, session, params) => {
 
 }
 
+const promisifyBranch = (conn, session, dataset) => {
+
+    return new Promise((resolve, reject) => {
+
+      const params = {
+        dataset_id: dataset.id,
+        latest_date: dataset.date
+      }
+
+      generateDatasetBranch(conn, session, params)
+        .then(branch => {
+          console.log(`Generated Branch for ${dataset.id}`)
+          resolve({
+            dataset_id: dataset.id,
+            branch: branch
+          })
+        })
+        .catch(e => {
+          console.log(`Rejecting ${dataset.id}: ${e.message}.`)
+          reject({
+            dataset_id: dataset.id,
+            error: e.message
+          })
+        })
+
+    })
+
+}
+
+const newDataflow = async (conn, df_params, dataflow_string) => {
+
+  try {
+
+    let df_id;
+
+    if (df_params.operation === "create") {
+      const df = await org.createDataflow(conn, {
+        DeveloperName: df_params.name,
+        MasterLabel: df_params.label,
+        State: "Active"
+      })
+      df_id = df.id;
+    } else {
+      df_id = df_params.id;
+    }
+
+    const dfv = await org.createDataflowVersion(conn, {
+      DataflowId: df_id,
+      DataflowDefinition: dataflow_string
+    })
+
+    await org.assignDataflowVersion(conn, df_id, dfv.id)
+
+    return {
+      success: true,
+      dataflow_id: df_id,
+      dataflow_version_id: dfv.id
+    }
+
+  } catch (e) {
+    console.error(e.message)
+    return {
+      success: false,
+      message: e.message
+    }
+  }
+
+}
+
 exports.timeshiftDatasets = async (conn, session, df_params, ts_array) => {
 
   console.log("Generating timeshift dataflow...")
@@ -48,42 +117,13 @@ exports.timeshiftDatasets = async (conn, session, df_params, ts_array) => {
   let assignToSingleObject = (branches) => {
     const def = {}
     for (const b of branches) {
-      if (b.value)
-        Object.assign(def, b.value.object)
+      Object.assign(def, b.object)
     } return def
   }
 
-  const results = await Promise.allSettled(
-    ts_array.map(dataset => {
-
-      return new Promise((resolve, reject) => {
-
-        const params = {
-          dataset_id: dataset.id,
-          latest_date: dataset.date
-        }
-
-        generateDatasetBranch(conn, session, params)
-          .then(branch => {
-            console.log(`Generated Branch for ${dataset.id}`)
-            resolve({
-              dataset_id: dataset.id,
-              branch: branch
-            })
-          })
-          .catch(e => {
-            console.log(`Rejecting ${dataset.id}: ${e.message}.`)
-            reject({
-              dataset_id: dataset.id,
-              error: e.message
-            })
-          })
-
-      })
-
-    })
-
-  )
+  const results = await Promise.allSettled(ts_array.map(dataset => {
+    return promisifyBranch(conn, session, dataset)
+  }))
 
   const branches = results.filter(d => d.status === "fulfilled"),
         errors = results.filter(d => d.status === "rejected").map(d => d.reason);
@@ -94,74 +134,17 @@ exports.timeshiftDatasets = async (conn, session, df_params, ts_array) => {
           df_definition = assignToSingleObject(branch_definitions),
           df_definition_str = JSON.stringify(df_definition),
           branch_results = branches.map(d => {
-            return {
-              dataset_id: d.value.dataset_id
-            }
+            return { dataset_id: d.value.dataset_id }
           });
 
-    /* Create net new dataflow providing @name, @label */
-    if (df_params.operation === "create") {
+    const df_result = await newDataflow(conn, df_params, df_definition_str)
 
-      try {
-
-        const df = await org.createDataflow(conn, {
-          DeveloperName: df_params.name,
-          MasterLabel: df_params.label,
-          State: "Active"
-        })
-
-        const dfv = await org.createDataflowVersion(conn, {
-          DataflowId: df.id,
-          DataflowDefinition: df_definition_str
-        })
-
-        await org.assignDataflowVersion(conn, df.id, dfv.id)
-
-        return {
-          success: true,
-          dataflow_id: df.id,
-          dataflow_version_id: dfv.id,
-          branches: branch_results,
-          errors: errors
-        }
-
-      } catch (e) {
-        return {
-          success: false,
-          message: e.message
-        }
-      }
-
+    if (df_result.success) {
+      df_result.branches = branch_results
+      df_result.errors = errors
     }
 
-    /* Overwrite existing dataflow definition providing @id */
-    else if (df_params.operation === "overwrite") {
-
-      try {
-
-        const dfv = await org.createDataflowVersion(conn, {
-          DataflowId: df_params.id,
-          DataflowDefinition: df_definition_str
-        })
-
-        await org.assignDataflowVersion(conn, df_params.id, dfv.id)
-
-        return {
-          success: true,
-          dataflow_id: df_params.id,
-          dataflow_version_id: dfv.id,
-          branches: branch_results,
-          errors: errors
-        }
-
-      } catch (e) {
-        return {
-          success: false,
-          message: e.message
-        }
-      }
-
-    }
+    return df_result
 
   } else {
 
