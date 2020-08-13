@@ -4,21 +4,11 @@ const deploy = require(appRoot + "/src/template/deploy")
 module.exports = async (params) => {
 
   try {
-
     const conn = auth.refreshConnection(params.session)
-
-    const deploy_result = await deploy.deployFromRepository(
-      conn,
-      params
-    )
-
-    return deploy_result
-
+    return await deploy.deployFromRepository(conn, params)
   } catch (e) {
-
     console.error(e.message)
     return { success: false, errors: [ e.message ] }
-
   }
 
 }

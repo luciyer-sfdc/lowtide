@@ -13,15 +13,22 @@ exports.validDataflowOperation = (req) => {
   const valid_create = (
     matchValue(req.body.dataflow_parameters, "operation", "create") &&
     objectHas(req.body.dataflow_parameters, "name") &&
-    objectHas(req.body.dataflow_parameters, "label")
+    objectHas(req.body.dataflow_parameters, "label") &&
+    objectHas(req.body, "dataset_array")
   )
 
   const valid_overwrite = (
     matchValue(req.body.dataflow_parameters, "operation", "overwrite") &&
+    objectHas(req.body.dataflow_parameters, "id") && 
+    objectHas(req.body, "dataset_array")
+  )
+
+  const valid_dynamic = (
+    matchValue(req.body.dataflow_parameters, "operation", "dynamic") &&
     objectHas(req.body.dataflow_parameters, "id")
   )
 
-  return (has_params && (valid_create || valid_overwrite))
+  return (has_params && (valid_create || valid_overwrite || valid_dynamic))
 
 }
 

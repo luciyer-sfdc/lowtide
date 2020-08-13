@@ -1,7 +1,4 @@
-const jsforce = require("jsforce")
-
-const config = require(appRoot + "/config"),
-      org = require(appRoot + "/src/org");
+const org = require(appRoot + "/src/org")
 
 const dates = require("./dates")
 const { Branch } = require("./definition")
@@ -23,7 +20,7 @@ const generateDatasetBranch = async (conn, session, params) => {
     const branch_settings = {
       input_ds: dataset.dataset_name,
       output_ds: dataset.dataset_name,
-      date_fields: date_fields,
+      date_fields: date_fields
     }
 
     if (latest_date)
@@ -155,17 +152,5 @@ exports.timeshiftDatasets = async (conn, session, df_params, ts_array) => {
     }
 
   }
-
-}
-
-exports.amendDataflow = (conn, session, dataset_id) => {
-
-  //Fix LPD after first run
-
-  // get Dataflow & parse to object
-
-  // Confirm LPD field exists
-
-  // replace static values with LPD field
 
 }

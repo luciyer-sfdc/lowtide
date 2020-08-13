@@ -92,7 +92,7 @@ app.route(config.ltApi("org_datasets_refresh"))
 
 app.route(config.ltApi("org_dataflows"))
   .get(router.org.getOrgDataflows)
-  .post(router.timeshift.generateDataflow)
+  .post(router.timeshift.dataflowOperation)
 
 app.route(config.ltApi("org_dataflows_folder"))
   .get(router.org.getOrgDataflows)
