@@ -2,49 +2,18 @@
 
 Tooling for Einstein Analytics Demos. Built by EA Tech PMM.
 
-Contacts:
+Author:
+Luc Iyer <luciyer@salesforce.com>
 
-Luc Iyer (luciyer@salesforce.com), Terrence Tse (ttse@salesforce.com), Rodrigo Mercader (rmercader@salesforce.com)
+Technical Contacts:
+Terrence Tse <ttse@salesforce.com>
+Rodrigo Mercader <rmercader@salesforce.com>
 
 ---
-### Route Listing (Reference as of 20 July)
-
-```
-{
-  "all" : "*",
-  "auth_required" : "/api/*",
-
-  "auth" : "/api/auth/*",
-
-  "auth_request" : "/api/auth",
-  "auth_callback" : "/api/auth/callback",
-  "auth_revoke" : "/api/auth/revoke",
-  "auth_session" : "/api/auth/session",
-
-  "org" : "/api/org/*",
-
-  "org_templates" : "/api/org/template",
-  "org_template_single" : "/api/org/template/:template_id",
-  "org_template_download" : "/api/org/template/:template_id/download",
-  "org_template_upload" : "/api/org/template/upload",
-  "org_datasets" : "/api/org/dataset",
-  "org_dataflows" : "/api/org/dataflow",
-  "org_dataflow_single" : "/api/org/dataflow/:dataflow_id",
-  "org_dataflow_run" : "/api/org/dataflow/run/:dataflow_id",
-  "org_dataflow_schedule" : "/api/org/dataflow/schedule/:dataflow_id",
-
-  "repo" : "/api/repository/*",
-
-  "repo_templates" : "/api/repository/template/:branch",
-  "repo_template_single" : "/api/repository/template/:branch/:template_name",
-  "repo_template_download" : "/api/repository/template/:branch/download/:template_name",
-  "repo_template_deploy_status" : "/api/repository/template/deploy/status/:deploy_id"
-
-}
-```
-
 
 ### Authentication
+
+See https://github.com/luciyer-sfdc/lowtide-auth for boilerplate.
 
 #### Username & Password
 
@@ -86,84 +55,98 @@ Luc Iyer (luciyer@salesforce.com), Terrence Tse (ttse@salesforce.com), Rodrigo M
 
 `GET` `/api/auth/revoke`
 
----
+#### Unauthenticated Requests
 
-### Org Templates
-
-#### All Org Templates
-
-`GET` `/api/org/template`
-
-#### Org Template by Id
-
-`GET` `/api/org/template/:template_id`
+Any requests matching `/api/*` without a valid Salesforce session will be denied.
 
 ---
 
-### Repository Templates
+### Salesforce Org Einstein Analytics Operations
 
-#### Template Listing
+#### Folders (Apps)
 
-`GET` `/api/repository/template/:branch`
+List Folders
+`GET` @ `/api/org/folder`
 
-#### Deploy Templates
+#### Datasets
 
-`POST` `/api/repository/template/:branch`
+List Datasets
+`GET` @ `/api/org/dataset`
+
+List Datasets inside `folder_id`
+`GET` @ `/api/org/dataset/:folder_id`
+
+Touch (refresh) all Datasets in org [RETURNS JOB]
+`GET` @ `/api/org/dataset/refresh`
+
+#### Dataflows & Timeshifting
+
+List Dataflows
+`GET` @ `/api/org/dataflow`
+
+Create/Overwrite/Propagate Timeshifting Dataflow [RETURNS JOB]
+`POST` @ `/api/org/dataflow`
 
 ```
 {
-  "templates" : [
-    "Template_1",
-    "Template_2",
-    "Yet_Another_Template"
-  ]
+    "dataflow_parameters" : {
+        "operation" : "[create|overwrite|dynamic]",
+        "name" : "some_dataflow_name",
+        "label" : "Some Dataflow Label"
+    },
+    "dataset_array": [
+        { "id": "0Fb5A000000kBbfSAE" },
+        { "id": "0Fb5A000000kBbkSAE" }
+    ]
 }
 ```
 
-Returns:
+List Dataflows inside `folder_id`
+`GET` @ `/api/org/dataflow/:folder_id`
 
-```
-{
-  "done": true,
-  "id": "0Af3h000006hYB3CAM",
-  "state": "Completed"
-}
-```
+Get Single Dataflow & DataflowVersion with `dataflow_id`
+`GET` @ `/api/org/dataflow/single/:dataflow_id`
 
-#### Check Deploy Status
+#### Analytics Templates
 
-`GET` `/api/repository/template/deploy/status/:deploy_id`
+List Templates
+`GET` @ `/api/org/template`
+
+Create Template from App [IN PROGRESS]
+`POST` @ `/api/org/template`
+
+Update Template from App [IN PROGRESS]
+`PATCH` @ `/api/org/template`
+
+Get Single Template
+`GET` @ `/api/org/template/:template_id`
+
+Delete Single Template
+`DELETE` @ `/api/org/template/:template_id`
 
 ---
 
-### Dataflows
+### Template Deploy Operations
 
-#### Org Dataflows
+Get Available Templates from `:branch` [beta|master]
+`GET` @ `/api/repository/template/:branch`
 
-`GET` `/api/org/dataflow`
-
-#### Timeshift Array of Datasets
-
-`POST` `/api/org/dataflow`
+Deploy Templates from `:branch` [beta|master] [RETURNS JOB]
+`POST` @ `/api/repository/template/:branch/deploy`
 
 ```
 {
-	"dataflow_name" : "app_shifted",
-  "dataset_array" : [
-    { "id" : "xxx" },
-    { "id" : "yyy", "date" : "2020-01-01" },
-  ]
+    "templates" : [
+        "CSV_Template",
+        "EAPMM_EA_for_CG",
+        "EAPMM_EA_for_ERM"
+    ]
 }
 ```
 
-#### Update Dataflow
+---
 
-`PATCH` `/api/org/dataflow/:dataflow_id`
+### Check Job Status
 
-```
-{
-  "name" : "RenamedDataflow",
-  "label" : "Updated Dataflow",
-  "definition" : {}
-}
-```
+Get status of job with `job_id`
+`GET` @ `/api/jobs/:job_id`
