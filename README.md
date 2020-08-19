@@ -1,4 +1,4 @@
-## Lowtide
+# Lowtide
 
 Tooling for Einstein Analytics Demos. Built by EA Tech PMM.
 
@@ -14,7 +14,7 @@ Rodrigo Mercader <rmercader@salesforce.com>
 
 ---
 
-### Authentication
+## Authentication
 
 See https://github.com/luciyer-sfdc/lowtide-auth for boilerplate.
 
@@ -64,35 +64,35 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 
 ---
 
-### Salesforce Org Einstein Analytics Operations
+## Salesforce Org Einstein Analytics Operations
 
-#### Folders (Apps)
+### Folders (Apps)
 
-List Folders
+#### List Folders
 
 `GET` @ `/api/org/folder`
 
-#### Datasets
+### Datasets
 
-List Datasets
+#### List Datasets
 
 `GET` @ `/api/org/dataset`
 
-List Datasets inside `folder_id`
+#### List Datasets inside `folder_id`
 
 `GET` @ `/api/org/dataset/:folder_id`
 
-Touch (refresh) all Datasets in org [RETURNS JOB]
+#### Touch (refresh) all Datasets in org [RETURNS JOB]
 
 `GET` @ `/api/org/dataset/refresh`
 
-#### Dataflows & Timeshifting
+### Dataflows & Timeshifting
 
-List Dataflows
+#### List Dataflows
 
 `GET` @ `/api/org/dataflow`
 
-Create/Overwrite/Propagate Timeshifting Dataflow [RETURNS JOB]
+#### Create/Overwrite/Propagate Timeshifting Dataflow [RETURNS JOB]
 
 `POST` @ `/api/org/dataflow`
 
@@ -110,45 +110,45 @@ Create/Overwrite/Propagate Timeshifting Dataflow [RETURNS JOB]
 }
 ```
 
-List Dataflows inside `folder_id`
+#### List Dataflows inside `folder_id`
 
 `GET` @ `/api/org/dataflow/:folder_id`
 
-Get Single Dataflow & DataflowVersion with `dataflow_id`
+#### Get Single Dataflow & DataflowVersion with `dataflow_id`
 
 `GET` @ `/api/org/dataflow/single/:dataflow_id`
 
-#### Analytics Templates
+### Analytics Templates
 
-List Templates
+#### List Templates
 
 `GET` @ `/api/org/template`
 
-Create Template from App [IN PROGRESS]
+#### Create Template from App [IN PROGRESS]
 
 `POST` @ `/api/org/template`
 
-Update Template from App [IN PROGRESS]
+#### Update Template from App [IN PROGRESS]
 
 `PATCH` @ `/api/org/template`
 
-Get Single Template
+#### Get Single Template
 
 `GET` @ `/api/org/template/:template_id`
 
-Delete Single Template
+#### Delete Single Template
 
 `DELETE` @ `/api/org/template/:template_id`
 
 ---
 
-### Template Deploy Operations
+## Template Deploy Operations
 
-Get Available Templates from `:branch` [beta|master]
+#### Get Available Templates from `:branch` [beta|master]
 
 `GET` @ `/api/repository/template/:branch`
 
-Deploy Templates from `:branch` [beta|master] [RETURNS JOB]
+#### Deploy Templates from `:branch` [beta|master] [RETURNS JOB]
 
 `POST` @ `/api/repository/template/:branch/deploy`
 
@@ -164,8 +164,8 @@ Deploy Templates from `:branch` [beta|master] [RETURNS JOB]
 
 ---
 
-### Check Job Status
+## Check Job Status
 
-Get status of job with `job_id`
+#### Get status of job with `job_id`
 
 `GET` @ `/api/jobs/:job_id`
