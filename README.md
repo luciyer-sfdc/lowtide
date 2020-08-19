@@ -104,10 +104,12 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 
 `POST` @ `/api/org/dataflow`
 
+Create...
+
 ```
 {
     "dataflow_parameters" : {
-        "operation" : "[create|overwrite|dynamic]",
+        "operation" : "create",
         "name" : "some_dataflow_name",
         "label" : "Some Dataflow Label"
     },
@@ -115,6 +117,34 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
         { "id": "0Fb5A000000kBbfSAE" },
         { "id": "0Fb5A000000kBbkSAE" }
     ]
+}
+```
+
+
+Overwrite...
+
+```
+{
+    "dataflow_parameters" : {
+        "operation" : "overwrite",
+        "id" : "02K5A000000iDu4UAE",
+    },
+    "dataset_array": [
+        { "id": "0Fb5A000000kBbfSAE" },
+        { "id": "0Fb5A000000kBbkSAE" }
+    ]
+}
+```
+
+
+Propagate...
+
+```
+{
+    "dataflow_parameters": {
+        "operation": "dynamic",
+        "id": "02K5A000000iDu4UAE"
+    }
 }
 ```
 
