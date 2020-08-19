@@ -183,3 +183,8 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 #### Get status of job with `job_id`
 
 `GET` @ `/api/jobs/:job_id`
+
+
+## Template Repo Maintenance
+
+See https://github.com/luciyer-sfdc/lowtide-zip (CLI).
