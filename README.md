@@ -8,9 +8,7 @@ Luc Iyer <luciyer@salesforce.com>
 
 Technical Contacts:
 
-Terrence Tse <ttse@salesforce.com>
-
-Rodrigo Mercader <rmercader@salesforce.com>
+Terrence Tse <ttse@salesforce.com>, Rodrigo Mercader <rmercader@salesforce.com>
 
 ---
 
@@ -18,7 +16,7 @@ Rodrigo Mercader <rmercader@salesforce.com>
 
 See https://github.com/luciyer-sfdc/lowtide-auth for boilerplate.
 
-Authenticate with Username & Password
+#### Authenticate with Username & Password
 
 `POST` @ `/api/auth`
 
@@ -32,7 +30,8 @@ Authenticate with Username & Password
 }
 ```
 
-Authenticate with Session ID & Server URL
+
+#### Authenticate with Session ID & Server URL
 
 `POST` @ `/api/auth`
 
@@ -46,19 +45,23 @@ Authenticate with Session ID & Server URL
 }
 ```
 
-Oauth2 Flow
+
+#### Oauth2 Flow
 
 `GET` @ `/api/auth`
 
-Get Session Information
+
+#### Get Session Information
 
 `GET` @ `/api/auth/session`
 
-Logout
+
+#### Logout
 
 `GET` @ `/api/auth/revoke`
 
-Unauthenticated Requests
+
+#### Unauthenticated Requests
 
 Any requests matching `/api/*` without a valid Salesforce session will be denied.
 
@@ -72,25 +75,30 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 
 `GET` @ `/api/org/folder`
 
+
 ### Datasets
 
 #### List Datasets
 
 `GET` @ `/api/org/dataset`
 
+
 #### List Datasets inside `folder_id`
 
 `GET` @ `/api/org/dataset/:folder_id`
 
+
 #### Touch (refresh) all Datasets in org [RETURNS JOB]
 
 `GET` @ `/api/org/dataset/refresh`
+
 
 ### Dataflows & Timeshifting
 
 #### List Dataflows
 
 `GET` @ `/api/org/dataflow`
+
 
 #### Create/Overwrite/Propagate Timeshifting Dataflow [RETURNS JOB]
 
@@ -110,13 +118,16 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 }
 ```
 
+
 #### List Dataflows inside `folder_id`
 
 `GET` @ `/api/org/dataflow/:folder_id`
 
+
 #### Get Single Dataflow & DataflowVersion with `dataflow_id`
 
 `GET` @ `/api/org/dataflow/single/:dataflow_id`
+
 
 ### Analytics Templates
 
@@ -124,29 +135,33 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 
 `GET` @ `/api/org/template`
 
+
 #### Create Template from App [IN PROGRESS]
 
 `POST` @ `/api/org/template`
+
 
 #### Update Template from App [IN PROGRESS]
 
 `PATCH` @ `/api/org/template`
 
+
 #### Get Single Template
 
 `GET` @ `/api/org/template/:template_id`
+
 
 #### Delete Single Template
 
 `DELETE` @ `/api/org/template/:template_id`
 
----
 
 ## Template Deploy Operations
 
 #### Get Available Templates from `:branch` [beta|master]
 
 `GET` @ `/api/repository/template/:branch`
+
 
 #### Deploy Templates from `:branch` [beta|master] [RETURNS JOB]
 
@@ -162,7 +177,6 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 }
 ```
 
----
 
 ## Check Job Status
 
