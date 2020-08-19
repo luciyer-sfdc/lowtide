@@ -123,3 +123,10 @@ app.route(config.ltApi("job_status"))
   .get(router.jobs.getStatus)
 
 app.get("/", (_, res) => res.sendStatus(200))
+
+app.get("/test", async (req, res) => {
+  const update_job = await agenda.now("update_repository", {
+    is_master: true
+  })
+  res.status(200).json(update_job)
+})

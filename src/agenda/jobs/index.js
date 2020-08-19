@@ -5,5 +5,6 @@ module.exports = {
   updateTimeshift: require("./update_timeshift_dataflow"),
   deployTemplates: require("./deploy_templates"),
   refreshDatasets: require("./touch_datasets").firstTouch,
-  checkRefresh: require("./touch_datasets").checkRefresh
+  checkRefresh: require("./touch_datasets").checkRefresh,
+  updateRepo: require("./update_template_repository")
 }

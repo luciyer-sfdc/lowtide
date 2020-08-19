@@ -75,4 +75,17 @@ queue.define("deploy_templates", async job => {
 
 })
 
+queue.define("update_repository", async job => {
+
+    console.log("Running job update_repository...")
+
+    const is_master = job.attrs.data.is_master
+    const job_result = await jobs.updateRepo(is_master)
+    job.attrs.job_result = job_result
+
+    console.log("Finished job update_repository.")
+
+})
+
+
 module.exports = queue
