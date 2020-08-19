@@ -83,12 +83,12 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 `GET` @ `/api/org/dataset`
 
 
-#### List Datasets inside `folder_id`
+#### List Datasets inside Folder
 
 `GET` @ `/api/org/dataset/:folder_id`
 
 
-#### Touch (refresh) all Datasets in org [RETURNS JOB]
+#### Touch (refresh) all Datasets in org `[RETURNS JOB]`
 
 `GET` @ `/api/org/dataset/refresh`
 
@@ -100,7 +100,7 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 `GET` @ `/api/org/dataflow`
 
 
-#### Create/Overwrite/Propagate Timeshifting Dataflow [RETURNS JOB]
+#### Create/Overwrite/Propagate Timeshifting Dataflow `[RETURNS JOB]`
 
 `POST` @ `/api/org/dataflow`
 
@@ -119,12 +119,12 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 ```
 
 
-#### List Dataflows inside `folder_id`
+#### List Dataflows inside Folder
 
 `GET` @ `/api/org/dataflow/:folder_id`
 
 
-#### Get Single Dataflow & DataflowVersion with `dataflow_id`
+#### Get Single Dataflow & DataflowVersion
 
 `GET` @ `/api/org/dataflow/single/:dataflow_id`
 
@@ -136,12 +136,12 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 `GET` @ `/api/org/template`
 
 
-#### Create Template from App [IN PROGRESS]
+#### Create Template from App `[IN PROGRESS]`
 
 `POST` @ `/api/org/template`
 
 
-#### Update Template from App [IN PROGRESS]
+#### Update Template from App `[IN PROGRESS]`
 
 `PATCH` @ `/api/org/template`
 
@@ -158,12 +158,12 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 
 ## Template Deploy Operations
 
-#### Get Available Templates from `:branch` [beta|master]
+#### Get Available Templates from branch [beta|master]
 
 `GET` @ `/api/repository/template/:branch`
 
 
-#### Deploy Templates from `:branch` [beta|master] [RETURNS JOB]
+#### Deploy Templates from branch [beta|master] `[RETURNS JOB]`
 
 `POST` @ `/api/repository/template/:branch/deploy`
 
@@ -180,7 +180,7 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 
 ## Check Job Status
 
-#### Get status of job with `job_id`
+#### Get Status of Job
 
 `GET` @ `/api/jobs/:job_id`
 
