@@ -10,7 +10,7 @@ Technical Contacts:
 
 Terrence Tse <ttse@salesforce.com>, Rodrigo Mercader <rmercader@salesforce.com>
 
----
+
 
 ## Authentication
 
@@ -65,7 +65,7 @@ See https://github.com/luciyer-sfdc/lowtide-auth for boilerplate.
 
 Any requests matching `/api/*` without a valid Salesforce session will be denied.
 
----
+
 
 ## Salesforce Org Einstein Analytics Operations
 
