@@ -77,10 +77,12 @@ const getTemplateManifest = async (params) => {
 
   return manifest.map(item => {
 
-    const template_api = parseInt(item.template.api_version),
+    const template_key = item.s3.Key,
+          template_api = parseInt(item.template.api_version),
           is_deployable = template_api <= org_api;
 
     item.template.deployable = is_deployable
+    item.template.template_key = template_key
 
     return item
 

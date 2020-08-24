@@ -200,9 +200,9 @@ Propagate...
 ```
 {
     "templates" : [
-        "CSV_Template",
-        "EAPMM_EA_for_CG",
-        "EAPMM_EA_for_ERM"
+        "beta/CSV_Template.zip",
+        "beta/EAPMM_EA_for_CG.zip",
+        "beta/EAPMM_EA_for_ERM.zip"
     ]
 }
 ```
