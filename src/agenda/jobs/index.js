@@ -3,8 +3,7 @@ module.exports = {
   updateTemplate: require("./app_template").update,
   timeshift: require("./timeshift_datasets"),
   updateTimeshift: require("./update_timeshift_dataflow"),
-  deployTemplates: require("./deploy_templates"),
+  deployS3Templates: require("./deploy_from_s3"),
   refreshDatasets: require("./touch_datasets").firstTouch,
-  checkRefresh: require("./touch_datasets").checkRefresh,
-  updateRepo: require("./update_template_repository")
+  checkRefresh: require("./touch_datasets").checkRefresh
 }

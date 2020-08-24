@@ -115,7 +115,7 @@ app.route(config.ltApi("repo_templates"))
   .get(router.repo.getTemplates)
 
 app.route(config.ltApi("repo_template_deploy"))
-  .post(router.repo.deployTemplates)
+  .post(router.repo.deployFromS3)
 
 /* ASYNC JOB QUEUE */
 

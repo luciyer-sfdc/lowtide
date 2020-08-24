@@ -2,7 +2,7 @@ module.exports = {
   auth: require("./auth"),
   org: require("./org"),
   repo: require("./repo"),
-  template: require("./template"),
+  router: require("./router"),
   timeshift: require("./timeshift"),
   util: require("./utils")
 }

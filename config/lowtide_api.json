@@ -15,7 +15,7 @@
 
   "org_datasets" : "/api/org/dataset",
   "org_datasets_folder" : "/api/org/dataset/:folder_id",
-  "org_datasets_refresh" : "/api/org/dataset/refresh",
+  "org_datasets_refresh" : "/api/org/refresh",
 
   "org_dataflows" : "/api/org/dataflow",
   "org_dataflows_folder" : "/api/org/dataflow/:folder_id",

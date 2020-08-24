@@ -2,58 +2,47 @@ const config = require(appRoot + "/config")
 const auth = require(appRoot + "/src/auth")
 const org = require(appRoot + "/src/org")
 
-class TouchDataset {
+const queryErrorMap = () => {
+  const status_map = new Map()
+  status_map.set("119", "null_version_id")
+  status_map.set("308", "refreshing")
+  status_map.set("402", "concurrency_limit")
+  return status_map
+}
 
+const batchArray = (array, batch_size) => {
+  return array.reduce((temp, x, i) => {
+    const sub_index = Math.floor(i / batch_size)
+    if(!temp[sub_index])
+      temp[sub_index] = []
+    temp[sub_index].push(x)
+    return temp
+  }, [])
+}
+
+class TouchQuery {
   constructor(dataset_id, dataset_version_id) {
     this.load = `q = load \"${dataset_id}/${dataset_version_id}\";`
     this.foreach = `q = foreach q generate count() as 'count';`
     this.query = { "query" : `${this.load} ${this.foreach}` }
   }
-
-  get json() {
-    return JSON.stringify(this.query);
-  }
-
 }
 
-const oneWeekAgo = () => {
-  const currentDate = new Date()
-  const pastDate = currentDate.getDate() - 7
-  currentDate.setDate(pastDate)
-  return currentDate
-}
+const getAllDatasets = async (conn) => {
 
-const pause = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+  const org_datasets = await org.getDatasets(conn)
 
-const getStaleDatasets = async (session) => {
-
-  const conn = auth.refreshConnection(session)
-
-  const org_datasets = await org.getDatasets(conn),
-        stale_date = oneWeekAgo(),
-        stale_datasets = [];
-
-  for (const dataset of org_datasets) {
-
-    const lqd = dataset.LastQueriedDate,
-          never_queried = lqd === null,
-          went_stale = new Date(lqd) < stale_date,
-          no_version = dataset.CurrentId === null;
-
-    if ((never_queried || went_stale) && !no_version) {
-      stale_datasets.push({
-        id: dataset.Id,
-        version_id: dataset.CurrentId,
-        last_queried: lqd,
-        refresh_query: new TouchDataset(dataset.Id, dataset.CurrentId)
-      })
-    }
-
-  }
-
-  return stale_datasets
+  return org_datasets
+    .filter(d => d.CurrentId !== null)
+    .map(d => {
+      return {
+        id: d.Id,
+        label: d.MasterLabel,
+        version_id: d.CurrentId,
+        last_queried: d.LastQueriedDate,
+        refresh: new TouchQuery(d.Id, d.CurrentId)
+      }
+  })
 
 }
 
@@ -61,59 +50,97 @@ exports.firstTouch = async (session) => {
 
   try {
 
+    const reporting_errors = [],
+          query_results = {
+            refreshed : [],
+            refreshing: [],
+            concurrency_limit: [],
+            null_version_id: []
+          };
+
     const conn = auth.refreshConnection(session),
-          query_endpoint = config.sfApi(session, "wave_query");
+          org_datasets = await getAllDatasets(conn),
+          query_endpoint = config.sfApi(session, "wave_query"),
+          status_map = queryErrorMap();
 
-    let query_counter = 0;
+    // Split datasets into batches of 10.
+    const batched_datasets = batchArray(org_datasets, 10)
 
-    const status_map = new Map()
+    // Batch by batch...
+    for (const batch of batched_datasets) {
 
-    status_map.set("308", "refreshing")
-    status_map.set("402", "concurrency_limit")
-    status_map.set("119", "null_version_id")
+      console.log("Querying Batch:", batch.map(d => `${d.id}/${d.version_id}`))
 
-    const stale_datasets = await getStaleDatasets(session)
+      // ... execute all queries in parallel and await that all "settle"
+      const batch_results = await Promise.allSettled(batch.map(async dataset => {
 
-    console.log("Found", stale_datasets.length, "stale datasets")
+        return new Promise(async (resolve, reject) => {
+          try {
 
-    const touches = stale_datasets.map(async dataset => {
+            const resp = await conn.requestPost(query_endpoint, dataset.refresh.query)
 
-      query_counter = query_counter + 1
+            resolve({
+              id: dataset.id,
+              label: dataset.label,
+              response: resp
+            })
 
-      console.log(`Query Dataset (${query_counter})...`)
+          } catch (e) {
 
-      if (query_counter % 10 === 0) {
-        console.log("Pause to reset concurrency timer.")
-        return pause(3000).then(() => {
-          return conn.requestPost(query_endpoint, dataset.refresh_query.query)
+            reject({
+              id: dataset.id,
+              label: dataset.label,
+              response: e
+            })
+
+          }
         })
-      } else {
-        return conn.requestPost(query_endpoint, dataset.refresh_query.query)
-      }
 
-    })
+      }))
 
-    const results = await Promise.allSettled(touches)
 
-    const parsed_results = results.map(d => {
-      let message;
-      if (d.status === "rejected")
-        message = status_map.get(d.reason.errorCode)
-      else
-        message = "refreshed"
-      return message
-    })
+      // Parse results to create response with statuses
+      const parsed_results = batch_results
+        .map(d => {
+
+          try {
+
+            let message, passed;
+
+            if (d.status === "rejected") {
+              message = status_map.get(d.reason.response.errorCode) || "error"
+              passed = d.reason
+            } else {
+              message = "refreshed"
+              passed = d.value
+            }
+
+            query_results[message].push({
+              id: passed.id, label: passed.label
+            })
+
+          } catch (e) {
+            reporting_errors.push(e.message)
+          }
+
+        })
+
+    }
+
+    // Return Status
 
     return {
       success: true,
-      stale: stale_datasets.length,
-      results: parsed_results,
-      errors: []
+      datasets: org_datasets.length,
+      results: query_results,
+      errors: reporting_errors
     }
+
 
   } catch (e) {
 
     console.error(e.message)
+
     return {
       success: false,
       errors: [ e.message ]
@@ -121,9 +148,4 @@ exports.firstTouch = async (session) => {
 
   }
 
-}
-
-exports.checkRefresh = async (session) => {
-  const stale_datasets = await getStaleDatasets(session)
-  console.log("Found", stale_datasets.length, "stale datasets")
 }
