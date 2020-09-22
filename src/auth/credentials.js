@@ -16,13 +16,21 @@ exports.store = (req) => {
 
     const conn = new jsforce.Connection()
 
-    conn.login(username, password, async (err, _) => {
+    conn.login(username, password, async (err, userInfo) => {
 
       if (!err) {
 
+        const relatedUser = await conn
+          .sobject("User")
+          .retrieve(userInfo.id)
+
         sf_object.opened_date = new Date()
         sf_object.api = await getVersion(conn)
+
         sf_object.auth_response = {
+          id: userInfo.id,
+          name: relatedUser.Name,
+          username: relatedUser.Username,
           accessToken: conn.accessToken,
           instanceUrl: conn.instanceUrl
         }

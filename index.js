@@ -2,6 +2,7 @@ require("dotenv").config()
 
 const path = require("path")
 const jsforce = require("jsforce")
+const morgan = require("morgan")
 
 global.appRoot = path.resolve(__dirname)
 
@@ -31,6 +32,7 @@ mongoose.connect(db_uri, {
 const app = express()
 
 app
+  .use(morgan("combined"))
   .use(bodyparser.json())
   .use(express.urlencoded({ extended: true }))
   .use(session({

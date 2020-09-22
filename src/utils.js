@@ -1,3 +1,5 @@
+const morgan = require("morgan")
+
 const getTimestamp = () => {
   return new Date().toLocaleTimeString()
 }
@@ -10,7 +12,7 @@ exports.bodyHasField = (req, field_name) => {
 }
 
 exports.logRequest = (req, res, next) => {
-  console.log(`[${getTimestamp()}]: (${req.method}) "${req.originalUrl}"`)
+  // Write to DB, async.
   next()
 }
 

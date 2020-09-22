@@ -88,11 +88,41 @@ exports.getTemplates = async (conn) => {
 
 }
 
-exports.getSingleTemplate = (conn, template_id) => {
+exports.getSingleTemplate = async (conn, template_id) => {
+
   console.log("Retrieving WaveTemplate", template_id)
-  return conn
+
+  const orgTemplate = await conn
     .sobject("WaveTemplate")
     .retrieve(template_id)
+
+    const templateInfoAsBuffer = Buffer.from(orgTemplate.TemplateInfo, "base64"),
+          templateInfoAsString = templateInfoAsBuffer.toString("utf-8");
+          data = JSON.parse(templateInfoAsString);
+
+    const api_version = data.assetVersion.toString() + ".0",
+          template_dashboards = data.dashboards.map(d => d.label),
+          template_datasets = data.externalFiles
+            .filter(d => d.type === "CSV")
+            .map(d => d.label);
+
+    return {
+      org: {
+        template_id: orgTemplate.Id,
+        last_update: orgTemplate.LastModifiedDate
+      },
+      template: {
+        api_name: data.name,
+        api_version: api_version,
+        label: data.label,
+        description: data.description,
+        version: data.releaseInfo.templateVersion,
+        tags: data.tags,
+        dashboards: template_dashboards,
+        datasets: template_datasets
+      }
+    }
+
 }
 
 exports.deleteSingleTemplate = (conn, template_id) => {

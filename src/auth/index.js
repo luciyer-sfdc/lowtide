@@ -63,7 +63,6 @@ const handleAuthRequired = (req, res, next) => {
 const visitedAuth = (req, res) => {
 
   console.log("Authorizing with Oauth2. Redirecting.")
-
   res.redirect(oauth.getUrl())
 
 }

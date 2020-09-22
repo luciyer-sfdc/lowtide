@@ -30,9 +30,17 @@ exports.store = (req) => {
 
       if (!err) {
 
+        const relatedUser = await conn
+          .sobject("User")
+          .retrieve(conn.userInfo.id)
+
         sf_object.opened_date = new Date()
         sf_object.api = await getVersion(conn)
+
         sf_object.auth_response = {
+          id: conn.userInfo.id,
+          name: relatedUser.Name,
+          username: relatedUser.Username,
           accessToken: conn.accessToken,
           instanceUrl: conn.instanceUrl
         }
