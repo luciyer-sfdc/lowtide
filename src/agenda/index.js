@@ -64,5 +64,13 @@ queue.define("update_repository", async job => {
     console.log("Finished job update_repository.")
 })
 
+queue.define("run_dataflow", async job => {
+    console.log("Running job run_dataflow...")
+    const params = job.attrs.data
+    const job_result = await jobs.runDataflowCmd(params)
+    job.attrs.job_result = job_result
+    console.log("Finished job run_dataflow.")
+})
+
 
 module.exports = queue

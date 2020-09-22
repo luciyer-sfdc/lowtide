@@ -100,6 +100,9 @@ app.route(config.ltApi("org_dataflows_folder"))
 app.route(config.ltApi("org_dataflow_single"))
   .get(router.org.getCurrentDataflowVersion)
 
+app.route(config.ltApi("org_dataflows_run"))
+  .get(router.org.runDataflow)
+
 app.route(config.ltApi("org_templates"))
   .get(router.org.getOrgTemplates)
   .post(router.org.createTemplateFromApp)
@@ -123,10 +126,3 @@ app.route(config.ltApi("job_status"))
   .get(router.jobs.getStatus)
 
 app.get("/", (_, res) => res.sendStatus(200))
-
-app.get("/test", async (req, res) => {
-  const update_job = await agenda.now("update_repository", {
-    is_master: true
-  })
-  res.status(200).json(update_job)
-})

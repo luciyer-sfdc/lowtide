@@ -1,4 +1,5 @@
 {
+  
   "all" : "*",
   "auth_required" : "/api/*",
 
@@ -20,6 +21,7 @@
   "org_dataflows" : "/api/org/dataflow",
   "org_dataflows_folder" : "/api/org/dataflow/:folder_id",
   "org_dataflow_single" : "/api/org/dataflow/single/:dataflow_id",
+  "org_dataflows_run" : "/api/org/dataflow/run/:dataflow_id",
 
   "org_templates" : "/api/org/template",
   "org_template_single" : "/api/org/template/:template_id",

@@ -140,19 +140,30 @@ exports.updateTemplateFromApp = async (req, res) => {
 exports.refreshDatasets = async (req, res) => {
 
   const refresh = await agenda.now("refresh_datasets", req.session)
-  //const confirm = await agenda.schedule("in 2 minutes", "check_refresh_status", req.session)
 
   res.status(200).json({
     refresh: {
       job_id: refresh.attrs._id,
       run_at: refresh.attrs.nextRunAt
     }
-    })
-    /*,
-    confirmation: {
-      job_id: confirm.attrs._id,
-      run_at: confirm.attrs.nextRunAt
+  })
+
+}
+
+exports.runDataflow = async (req, res) => {
+
+  const params = {
+    session: req.session,
+    dataflow_id: req.params.dataflow_id
+  }
+
+  const refresh = await agenda.now("run_dataflow", params)
+
+  res.status(200).json({
+    refresh: {
+      job_id: refresh.attrs._id,
+      run_at: refresh.attrs.nextRunAt
     }
-  })*/
+  })
 
 }

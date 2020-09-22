@@ -47,11 +47,45 @@ exports.getSingleDataflow = async (conn, dataflow_id) => {
 
 }
 
-exports.getTemplates = (conn) => {
+exports.getTemplates = async (conn) => {
+
   console.log("Querying org WaveTemplates...")
-  return conn
+
+  const orgTemplates = await conn
     .sobject("WaveTemplate")
     .find({ TemplateType : "App" })
+
+  return orgTemplates.map(template => {
+
+    const templateInfoAsBuffer = Buffer.from(template.TemplateInfo, "base64"),
+          templateInfoAsString = templateInfoAsBuffer.toString("utf-8");
+          data = JSON.parse(templateInfoAsString);
+
+    const api_version = data.assetVersion.toString() + ".0",
+          template_dashboards = data.dashboards.map(d => d.label),
+          template_datasets = data.externalFiles
+            .filter(d => d.type === "CSV")
+            .map(d => d.label);
+
+    return {
+      org: {
+        template_id: template.Id,
+        last_update: template.LastModifiedDate
+      },
+      template: {
+        api_name: data.name,
+        api_version: api_version,
+        label: data.label,
+        description: data.description,
+        version: data.releaseInfo.templateVersion,
+        tags: data.tags,
+        dashboards: template_dashboards,
+        datasets: template_datasets
+      }
+    }
+
+  })
+
 }
 
 exports.getSingleTemplate = (conn, template_id) => {
@@ -123,4 +157,11 @@ exports.assignDataflowVersion = (conn, df_id, dfv_id) => {
       Id: df_id,
       CurrentId: dfv_id
     })
+}
+
+exports.execRunDataflow = (conn, df_id) => {
+  console.log("Running Dataflow...")
+  const dataflowjobs_endpoint = config.sfApi("wave_dataflowjobs"),
+        request_body = { dataflowId: df_id, command: "start" };
+  return conn.requestPost(dataflowjobs_endpoint, request_body)
 }

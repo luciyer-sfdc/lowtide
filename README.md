@@ -88,7 +88,7 @@ Any requests matching `/api/*` without a valid Salesforce session will be denied
 `GET` @ `/api/org/dataset/:folder_id`
 
 
-#### Touch (refresh) all Datasets in org `[RETURNS JOBS]`
+#### Touch (refresh) all Datasets in org `[RETURNS JOB]`
 
 `GET` @ `/api/org/refresh`
 
