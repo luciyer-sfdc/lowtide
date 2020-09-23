@@ -48,6 +48,10 @@ logStream.on("open", (file) => {
     }
   });
 
+logStream.on("error", (err) => {
+  console.log("Log Stream Error:", err.message)
+})
+
   if (fs.readFileSync(file, "utf-8") === "")
     logStream.write(util.logger.headerLine, "utf-8", console.log("Wrote Log Header."))
 
