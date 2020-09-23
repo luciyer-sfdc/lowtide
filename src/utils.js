@@ -37,9 +37,10 @@ const pad = num => (num > 9 ? "" : "0") + num
 exports.logger = {
   headerLine: `Date,Agent,Method,Url,Status,ContentLength,ResponseTime_MS` + "\n",
   logFormat: `:date[iso],\":user-agent\",:method,\":url\",:status,:res[content-length],:response-time`,
-  filenameGenerator: (_, index) => {
-    const time = new Date(),
-          year = time.getFullYear(),
+  filenameGenerator: (time) => {
+    if (!time)
+      time = new Date()
+    const year = time.getFullYear(),
           month = pad(time.getMonth() + 1),
           day = pad(time.getDate());
     return `activity_${year}-${month}-${day}.log`;

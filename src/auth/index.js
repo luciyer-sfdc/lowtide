@@ -2,10 +2,10 @@ const jsforce = require("jsforce")
 
 const config = require(appRoot + "/config")
 
-const oauth = require("./oauth")
-const session = require("./session")
-const credentials = require("./credentials")
-const getVersion = require("./api_version")
+const oauth = require("./oauth"),
+      session = require("./session"),
+      credentials = require("./credentials"),
+      getVersion = require("./api_version");
 
 const VERBOSE = false
 
@@ -50,21 +50,16 @@ const refreshConnection = (session) => {
 }
 
 const handleAuthRequired = (req, res, next) => {
-
   if (!isAuthEndpoint(req) && !foundConnection(req))
     return res.status(500).json({
       message: "Not authenticated with Salesforce. First use /api/auth."
     })
-
   next()
-
 }
 
 const visitedAuth = (req, res) => {
-
   console.log("Authorizing with Oauth2. Redirecting.")
   res.redirect(oauth.getUrl())
-
 }
 
 
@@ -72,7 +67,7 @@ const routeRequest = (req, res) => {
 
   if (foundConnection(req))
     return res.status(200).json({
-      message: `Authenticated at: ${req.session.salesforce.auth_response.instanceUrl}`
+      message: `Already authenticated with ${req.session.salesforce.auth_response.instanceUrl}. Use /api/auth/revoke to destroy current session.`
     })
 
   if (req.body.source === "session") {

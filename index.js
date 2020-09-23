@@ -17,6 +17,7 @@ global.appRoot = path.resolve(__dirname)
 const config = require("./config"),
       auth = require("./src/auth"),
       util = require("./src/utils"),
+      repo = require("./src/repo"),
       agenda = require("./src/agenda"),
       router = require("./src/router");
 
@@ -34,8 +35,22 @@ const logsDir = path.join(__dirname, "logs"),
       logStream = rfs.createStream(util.logger.filenameGenerator, streamOptions);
 
 logStream.on("open", (file) => {
+
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayLog = util.logger.filenameGenerator(yesterday)
+
+  fs.exists(path.join(logsDir, yesterdayLog), (exists) => {
+    if (exists) {
+      console.log(`Log \"${yesterdayLog}\" found. Uploading to S3.`)
+      repo.uploadActivityLog(yesterdayLog)
+    } else {
+      console.log(`Log \"${yesterdayLog}\" not found. Not uploading to S3.`)
+    }
+  });
+
   if (fs.readFileSync(file, "utf-8") === "")
     logStream.write(util.logger.headerLine, "utf-8", console.log("Wrote Log Header."))
+
 })
 
 app

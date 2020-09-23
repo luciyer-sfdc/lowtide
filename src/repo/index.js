@@ -1,5 +1,8 @@
 require("dotenv").config()
 
+const fs = require("fs"),
+      path = require("path");
+
 const s3Connection = require("aws-sdk").S3
 
 const config = require(appRoot + "/config")
@@ -134,6 +137,31 @@ const downloadAndDeployTemplate = async (conn, params) => {
 
 }
 
+const uploadActivityLog = (fileName) => {
+
+  const bucketName = "lowtide-logs",
+        subFolder = "daily",
+        fileKey = `${subFolder}/${fileName}`;
+
+  const filePath = path.join(appRoot, "logs", fileName),
+        fileData = fs.createReadStream(filePath, { encoding: "utf8" })
+
+  const uploadParams = {
+    Bucket: "lowtide-logs",
+    Key: fileKey,
+    Body: fileData
+  }
+
+  return new Promise((resolve, reject) => {
+    s3.upload(uploadParams, (error, data) => {
+      if (error) reject(error)
+      console.log(`${fileKey} uploaded to ${bucketName}/${subFolder}.`)
+      resolve(data)
+    })
+  })
+
+}
+
 
 module.exports = {
   getObject: getObject,
@@ -141,5 +169,6 @@ module.exports = {
   readBucket: readBucket,
   clearFolder: clearFolder,
   getTemplateManifest: getTemplateManifest,
-  downloadAndDeployTemplate: downloadAndDeployTemplate
+  downloadAndDeployTemplate: downloadAndDeployTemplate,
+  uploadActivityLog: uploadActivityLog
 }
