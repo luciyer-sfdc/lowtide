@@ -114,7 +114,8 @@ const handleOauthCallback = (req, res) => {
   oauth.store(req)
     .then(sf => {
 
-      console.log("Redirecting to Homepage.")
+      const callbackUrl = new URL(req.hostname, req.originalUrl)
+      console.log("Redirecting to request origin:", callbackUrl)
 
       req.session.salesforce = sf
       res.redirect("/")

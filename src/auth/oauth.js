@@ -24,8 +24,6 @@ exports.store = (req) => {
 
     const conn = new jsforce.Connection({ oauth2: oauth2 })
 
-
-
     conn.authorize(req.query.code, async (err, userInfo) => {
 
       if (!err) {
