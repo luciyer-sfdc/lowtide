@@ -114,11 +114,9 @@ const handleOauthCallback = (req, res) => {
   oauth.store(req)
     .then(sf => {
 
-      /*
-      const callbackUrl = new URL(req.hostname, req.originalUrl)
+      const callbackUrl = req.hostname + req.originalUrl
       console.log("Redirecting to request origin:", callbackUrl)
-      */
-      
+
       req.session.salesforce = sf
       res.redirect("/")
 
