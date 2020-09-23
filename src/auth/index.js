@@ -86,7 +86,7 @@ const routeRequest = (req, res) => {
       })
       .catch(err => {
         console.error(err)
-        res.status(500).json({
+        res.status(403).json({
           message: err
         })
       })
@@ -101,7 +101,7 @@ const routeRequest = (req, res) => {
         res.sendStatus(200)
       })
       .catch(err => {
-        res.status(500).json({
+        res.status(403).json({
           message: err
         })
       })

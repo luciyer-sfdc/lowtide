@@ -1,18 +1,18 @@
 require("dotenv").config()
 
-const path = require("path")
-const jsforce = require("jsforce")
-const morgan = require("morgan")
+const fs = require("fs"),
+      path = require("path"),
+      cors = require("cors"),
+      morgan = require("morgan"),
+      jsforce = require("jsforce"),
+      express = require("express"),
+      mongoose = require("mongoose"),
+    { v4: uuidv4 } = require("uuid"),
+      session = require("express-session"),
+      MongoStore = require("connect-mongo")(session),
+      rfs = require("rotating-file-stream");
 
 global.appRoot = path.resolve(__dirname)
-
-const express = require("express")
-const session = require("express-session")
-const bodyparser = require("body-parser")
-const { v4: uuidv4 } = require("uuid")
-
-const mongoose = require("mongoose")
-const MongoStore = require("connect-mongo")(session)
 
 const config = require("./config"),
       auth = require("./src/auth"),
@@ -20,20 +20,29 @@ const config = require("./config"),
       agenda = require("./src/agenda"),
       router = require("./src/router");
 
-const db_uri = process.env.MONGODB_URI || "mongodb://localhost/dev"
+const dbUri = process.env.MONGODB_URI || "mongodb://localhost/dev",
+      dbOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
-mongoose.connect(db_uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+mongoose.connect(dbUri, dbOptions)
   .then(util.databaseConnected)
   .catch(console.error)
 
 const app = express()
 
+const logsDir = path.join(__dirname, "logs"),
+      streamOptions = { interval: "1d", path: logsDir },
+      logStream = rfs.createStream(util.logger.filenameGenerator, streamOptions);
+
+logStream.on("open", (file) => {
+  if (fs.readFileSync(file, "utf-8") === "")
+    logStream.write(util.logger.headerLine, "utf-8", console.log("Wrote Log Header."))
+})
+
 app
-  .use(morgan("combined"))
-  .use(bodyparser.json())
+  .use(cors())
+  .use(morgan("dev"))
+  .use(morgan(util.logger.logFormat, { stream: logStream }))
+  .use(express.json())
   .use(express.urlencoded({ extended: true }))
   .use(session({
     genid: (req) => {
@@ -54,11 +63,6 @@ app.listen(process.env.PORT || 8080, async () => {
   await agenda.start()
   util.onStart()
 })
-
-/* LOG REQUESTS */
-
-app.route(config.ltApi("all"))
-  .all(util.logRequest)
 
 /* AUTH */
 
