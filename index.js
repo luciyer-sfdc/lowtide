@@ -57,8 +57,12 @@ logStream.on("error", (err) => {
 
 })
 
+const corsOptions = {
+  credentials: true,
+}
+
 app
-  .use(cors())
+  .use(cors(corsOptions))
   .use(morgan("dev"))
   .use(morgan(util.logger.logFormat, { stream: logStream }))
   .use(express.json())
