@@ -67,11 +67,11 @@ const corsOptions = {
 }
 
 app
-  .use(cors())
+  .use(express.json())
   .use((req, res) => console.log(req.get("host")))
+  .use(cors())
   .use(morgan("dev"))
   //.use(morgan(util.logger.logFormat, { stream: logStream }))
-  .use(express.json())
   .use(express.urlencoded({ extended: true }))
   .use(session({
     genid: (req) => {
