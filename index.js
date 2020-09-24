@@ -30,6 +30,7 @@ mongoose.connect(dbUri, dbOptions)
 
 const app = express()
 
+/*
 
 const logsDir = path.join(__dirname, "logs"),
       streamOptions = { interval: "1d", path: logsDir },
@@ -58,16 +59,19 @@ logStream.on("error", (err) => {
 
 })
 
+*/
+
 const corsOptions = {
   allowedHeaders: "*"
 }
 
 app
-  .use(cors())
-  .use(morgan("dev"))
-  .use(morgan(util.logger.logFormat, { stream: logStream }))
   .use(express.json())
   .use(express.urlencoded({ extended: true }))
+  .use(cors(corsOptions))
+  .use((req, res, next) => { console.log(req.get("host")); next() })
+  .use(morgan("dev"))
+  //.use(morgan(util.logger.logFormat, { stream: logStream }))
   .use(session({
     genid: (req) => {
       return uuidv4()
