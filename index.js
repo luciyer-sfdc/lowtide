@@ -62,6 +62,7 @@ logStream.on("error", (err) => {
 */
 
 const corsOptions = {
+  origin: "*",
   allowedHeaders: "*"
 }
 
