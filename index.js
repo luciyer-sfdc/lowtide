@@ -67,7 +67,7 @@ const corsOptions = {
 
 app
   .use(cors(corsOptions))
-  .use((req, res) => console.log(req.hostname, req.originalUrl))
+  .use((req, res) => console.log(req.get("host")))
   .use(morgan("dev"))
   //.use(morgan(util.logger.logFormat, { stream: logStream }))
   .use(express.json())
