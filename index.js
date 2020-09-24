@@ -67,7 +67,7 @@ const corsOptions = {
 }
 
 app
-  .use(cors(corsOptions))
+  .use(cors())
   .use((req, res) => console.log(req.get("host")))
   .use(morgan("dev"))
   //.use(morgan(util.logger.logFormat, { stream: logStream }))
