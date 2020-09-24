@@ -51,7 +51,7 @@ const refreshConnection = (session) => {
 
 const handleAuthRequired = (req, res, next) => {
   if (!isAuthEndpoint(req) && !foundConnection(req))
-    return res.status(500).json({
+    return res.status(403).json({
       message: "Not authenticated with Salesforce. First use /api/auth."
     })
   next()
