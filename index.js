@@ -69,7 +69,7 @@ app
   .use(express.json())
   .use(express.urlencoded({ extended: true }))
   .use(cors(corsOptions))
-  .use((req, res, next) => { console.log(req.get("host")); next() })
+  .use((req, res, next) => { console.log(JSON.stringify(req.headers)); next() })
   .use(morgan("dev"))
   //.use(morgan(util.logger.logFormat, { stream: logStream }))
   .use(session({
