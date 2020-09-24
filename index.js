@@ -62,11 +62,13 @@ logStream.on("error", (err) => {
 */
 
 const corsOptions = {
+  credentials: true,
   allowedHeaders: "*"
 }
 
 app
   .use(cors(corsOptions))
+  .use((req, res) => console.log(req.hostname, req.originalUrl))
   .use(morgan("dev"))
   //.use(morgan(util.logger.logFormat, { stream: logStream }))
   .use(express.json())
@@ -77,7 +79,8 @@ app
     },
     secret: process.env.SESSION_SECRET,
     cookie: {
-      maxAge: (60 * 60 * 1000)
+      maxAge: (60 * 60 * 1000),
+      sameSite: "lax"
     },
     store: new MongoStore({
       mongooseConnection: mongoose.connection
