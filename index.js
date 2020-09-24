@@ -30,6 +30,8 @@ mongoose.connect(dbUri, dbOptions)
 
 const app = express()
 
+/*
+
 const logsDir = path.join(__dirname, "logs"),
       streamOptions = { interval: "1d", path: logsDir },
       logStream = rfs.createStream(util.logger.filenameGenerator, streamOptions);
@@ -57,14 +59,16 @@ logStream.on("error", (err) => {
 
 })
 
+*/
+
 const corsOptions = {
-  credentials: true,
+  allowedHeaders: "*"
 }
 
 app
   .use(cors(corsOptions))
   .use(morgan("dev"))
-  .use(morgan(util.logger.logFormat, { stream: logStream }))
+  //.use(morgan(util.logger.logFormat, { stream: logStream }))
   .use(express.json())
   .use(express.urlencoded({ extended: true }))
   .use(session({
