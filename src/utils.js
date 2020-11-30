@@ -1,5 +1,3 @@
-const morgan = require("morgan")
-
 const getTimestamp = () => {
   return new Date().toLocaleTimeString()
 }
@@ -31,18 +29,3 @@ exports.logAuth = (conn, userInfo) => {
 }
 
 exports.stayAwake = () => {}
-
-const pad = num => (num > 9 ? "" : "0") + num
-
-exports.logger = {
-  headerLine: `Date,Agent,Method,Url,Status,ContentLength,ResponseTime_MS` + "\n",
-  logFormat: `:date[iso],\":user-agent\",:method,\":url\",:status,:res[content-length],:response-time`,
-  filenameGenerator: (time) => {
-    if (!time)
-      time = new Date()
-    const year = time.getFullYear(),
-          month = pad(time.getMonth() + 1),
-          day = pad(time.getDate());
-    return `activity_${year}-${month}-${day}.log`;
-  }
-}

@@ -2,15 +2,12 @@ require("dotenv").config()
 
 const fs = require("fs"),
       path = require("path"),
-      cors = require("cors"),
-      morgan = require("morgan"),
       jsforce = require("jsforce"),
       express = require("express"),
       mongoose = require("mongoose"),
     { v4: uuidv4 } = require("uuid"),
       session = require("express-session"),
-      MongoStore = require("connect-mongo")(session),
-      rfs = require("rotating-file-stream");
+      MongoStore = require("connect-mongo")(session);
 
 global.appRoot = path.resolve(__dirname)
 
@@ -19,9 +16,10 @@ const config = require("./config"),
       util = require("./src/utils"),
       repo = require("./src/repo"),
       agenda = require("./src/agenda"),
-      router = require("./src/router");
+      router = require("./src/router"),
+      logger = require("./src/logger");
 
-const dbUri = process.env.MONGODB_URI || "mongodb://localhost/dev",
+const dbUri = process.env.MONGODB_URI,
       dbOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
 mongoose.connect(dbUri, dbOptions)
@@ -30,48 +28,10 @@ mongoose.connect(dbUri, dbOptions)
 
 const app = express()
 
-/*
-
-const logsDir = path.join(__dirname, "logs"),
-      streamOptions = { interval: "1d", path: logsDir },
-      logStream = rfs.createStream(util.logger.filenameGenerator, streamOptions);
-
-logStream.on("open", (file) => {
-
-  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayLog = util.logger.filenameGenerator(yesterday)
-
-  fs.exists(path.join(logsDir, yesterdayLog), (exists) => {
-    if (exists) {
-      console.log(`Log \"${yesterdayLog}\" found. Uploading to S3.`)
-      repo.uploadActivityLog(yesterdayLog)
-    } else {
-      console.log(`Log \"${yesterdayLog}\" not found. Not uploading to S3.`)
-    }
-  });
-
-logStream.on("error", (err) => {
-  console.log("Log Stream Error:", err.message)
-})
-
-  if (fs.readFileSync(file, "utf-8") === "")
-    logStream.write(util.logger.headerLine, "utf-8", console.log("Wrote Log Header."))
-
-})
-
-*/
-
-const corsOptions = {
-  allowedHeaders: "*"
-}
-
 app
   .use(express.json())
   .use(express.urlencoded({ extended: true }))
-  .use(cors(corsOptions))
-  .use((req, res, next) => { console.log(JSON.stringify(req.headers)); next() })
-  .use(morgan("dev"))
-  //.use(morgan(util.logger.logFormat, { stream: logStream }))
+  .use(logger)
   .use(session({
     genid: (req) => {
       return uuidv4()
@@ -161,3 +121,8 @@ app.route(config.ltApi("job_status"))
   .get(router.jobs.getStatus)
 
 app.get("/", (_, res) => res.sendStatus(200))
+
+app.get("/test", async (req, res) => {
+  await agenda.now("upload_logs")
+  res.sendStatus(200)
+})

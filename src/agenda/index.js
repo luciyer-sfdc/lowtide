@@ -3,11 +3,11 @@ require("dotenv").config()
 const Agenda = require("agenda"),
       jobs = require("./jobs");
 
-const db_uri = process.env.MONGODB_URI || "mongodb://localhost/dev"
+const dbUri = process.env.MONGODB_URI
 
 const connection_options = {
   db : {
-    address: db_uri,
+    address: dbUri,
     collection: "tasks",
     options: { useNewUrlParser: true, useUnifiedTopology: true }
   }
@@ -70,6 +70,13 @@ queue.define("run_dataflow", async job => {
     const job_result = await jobs.runDataflowCmd(params)
     job.attrs.job_result = job_result
     console.log("Finished job run_dataflow.")
+})
+
+queue.define("upload_logs", async job => {
+  console.log("Running job upload_logs...")
+  const job_result = await jobs.writeLogsToS3()
+  job.attrs.job_result = job_result
+  console.log("Finished job upload_logs.")
 })
 
 
