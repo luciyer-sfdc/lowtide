@@ -3,7 +3,7 @@ require("dotenv").config()
 const Agenda = require("agenda"),
       jobs = require("./jobs");
 
-const dbUri = `mongodb://${process.env.MDB_ATLAS_USER}:${process.env.MDB_ATLAS_PW}@cluster0-shard-00-00.isuul.mongodb.net:27017,cluster0-shard-00-01.isuul.mongodb.net:27017,cluster0-shard-00-02.isuul.mongodb.net:27017/lowtide?ssl=true&replicaSet=atlas-h683or-shard-0&authSource=admin&retryWrites=true&w=majority`
+const dbUri = process.env.MONGODB_URI
 
 const connection_options = {
   db : {
