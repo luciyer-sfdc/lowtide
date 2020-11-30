@@ -6,5 +6,6 @@ module.exports = {
   deployS3Templates: require("./deploy_from_s3"),
   refreshDatasets: require("./touch_datasets").firstTouch,
   checkRefresh: require("./touch_datasets").checkRefresh,
-  runDataflow: require("./run_dataflow")
+  runDataflow: require("./run_dataflow"),
+  writeLogsToS3: require("./write_logs_to_s3")
 }

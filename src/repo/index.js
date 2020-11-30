@@ -78,7 +78,17 @@ const getTemplateManifest = async (params) => {
   const results = await getObject(bucket, file),
         manifest = JSON.parse(results.Body.toString("utf-8"));
 
-  return manifest.map(item => {
+
+
+  return manifest
+    .sort((a, b) => {
+      if (a.template.label < b.template.label)
+        return -1
+      else if (a.template.label > b.template.label)
+        return 1
+      return 0
+    })
+    .map(item => {
 
     const template_key = item.s3.Key,
           template_api = parseInt(item.template.api_version),
@@ -138,6 +148,8 @@ const downloadAndDeployTemplate = async (conn, params) => {
 }
 
 const uploadActivityLog = (fileName) => {
+
+  const pass = new stream.PassThrough();
 
   const bucketName = "lowtide-logs",
         subFolder = "daily",
