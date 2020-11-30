@@ -5,7 +5,8 @@ const config = require(appRoot + "/config")
 const oauth = require("./oauth"),
       session = require("./session"),
       credentials = require("./credentials"),
-      getVersion = require("./api_version");
+      getVersion = require("./api_version"),
+      sessionConfig = require("./session_config");
 
 const VERBOSE = false
 
@@ -179,6 +180,7 @@ module.exports = {
 
   oauth: oauth,
   session: session,
-  credentials: credentials
+  credentials: credentials,
+  sessionConfig: sessionConfig
 
 }
