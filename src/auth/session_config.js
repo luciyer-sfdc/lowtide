@@ -4,7 +4,7 @@ const redis = require("redis")
 const session = require("express-session")
 
 let RedisStore = require("connect-redis")(session)
-let redisClient = redis.createClient()
+let redisClient = redis.createClient(process.env.REDIS_URL)
 
 const sessionOptions = {
   name: "lowtide.auth",
