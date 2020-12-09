@@ -23,7 +23,7 @@ exports.checkSessionJobs = async (req, res) => {
 
     let formattedResults;
 
-    const jobResults = await agenda.jobs({ "_id": { "$in": sessionJobs } })
+    const jobResults = await agenda.jobs({ _id: { $in: sessionJobs } })
 
     if (jobResults && jobResults.length > 0) {
       formattedResults = jobResults.map(formatResponse)
