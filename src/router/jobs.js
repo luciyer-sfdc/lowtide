@@ -15,13 +15,16 @@ exports.checkSessionJobs = async (req, res) => {
 
   console.log("Check status of jobs on current session.")
 
-  const sessionJobs = req.session.jobs.map(j => {
-    return new ObjectId(j.job_id)
-  })
-
   try {
 
     let formattedResults;
+
+    if (req.session.jobs.length === 0)
+      return res.status(422).json("No jobs found on session.")
+
+    const sessionJobs = req.session.jobs.map(j => {
+      return new ObjectId(j.job_id)
+    })
 
     const jobResults = await agenda.jobs({ _id: { $in: sessionJobs } })
 
@@ -29,7 +32,7 @@ exports.checkSessionJobs = async (req, res) => {
       formattedResults = jobResults.map(formatResponse)
       return res.status(200).json(formattedResults)
     } else {
-      return res.status(500).json("No jobs found on session.")
+      return res.status(500).json("Jobs not found in database.")
     }
 
   } catch (error) {
