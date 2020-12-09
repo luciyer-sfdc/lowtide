@@ -11,6 +11,34 @@ const formatResponse = (job) => {
   }
 }
 
+exports.checkSessionJobs = async (req, res) => {
+
+  console.log("Check status of jobs on current session.")
+
+  const sessionJobs = req.session.jobs.map(j => {
+    return new ObjectId(j.job_id)
+  })
+
+  try {
+
+    let formattedResults;
+
+    const jobResults = await agenda.jobs({ "_id": { "$in": sessionJobs } })
+
+    if (jobResults && jobResults.length > 0) {
+      formattedResults = jobResults.map(formatResponse)
+      return res.status(200).json(formattedResults)
+    } else {
+      return res.status(500).json("No jobs found on session.")
+    }
+
+  } catch (error) {
+    console.error(e.message)
+    return res.status(500).json(e.message)
+  }
+
+}
+
 exports.getStatus = async (req, res) => {
 
   const job_id = req.params.job_id
@@ -36,7 +64,3 @@ exports.getStatus = async (req, res) => {
   }
 
 }
-
-exports.recentJobs = async (req, res) => {}
-
-exports.pendingJobs = async (req, res) => {}

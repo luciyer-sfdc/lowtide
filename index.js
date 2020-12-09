@@ -120,9 +120,7 @@ app.route(config.ltApi("repo_template_deploy"))
 app.route(config.ltApi("job_status"))
   .get(router.jobs.getStatus)
 
-app.get("/", (_, res) => res.sendStatus(200))
+app.route(config.ltApi("session_jobs"))
+  .get(router.jobs.checkSessionJobs)
 
-app.get("/test", async (req, res) => {
-  await agenda.now("upload_logs")
-  res.sendStatus(200)
-})
+app.get("/", (_, res) => res.sendStatus(200))

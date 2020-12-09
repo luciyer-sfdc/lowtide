@@ -37,10 +37,19 @@ exports.deployFromS3 = async (req, res) => {
 
   const deploy = await agenda.now("deploy_s3_templates", params)
 
-  res.status(200).json({
+  const jobInfo = {
+    job_name: "Deploy Operation",
+    job_details: {
+      branch: req.params.branch,
+      templates: req.body.templates
+    },
     job_id: deploy.attrs._id,
     run_at: deploy.attrs.nextRunAt
-  })
+  }
+
+  req.session.jobs.push(jobInfo)
+
+  res.status(200).json(jobInfo)
 
 
 }

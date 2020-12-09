@@ -78,6 +78,7 @@ const routeRequest = (req, res) => {
     session.store(req)
       .then(sf => {
         req.session.salesforce = sf
+        req.session.jobs = []
         res.sendStatus(200)
       })
       .catch(err => {
@@ -94,6 +95,7 @@ const routeRequest = (req, res) => {
     credentials.store(req)
       .then(sf => {
         req.session.salesforce = sf
+        req.session.jobs = []
         res.sendStatus(200)
       })
       .catch(err => {
@@ -119,6 +121,7 @@ const handleOauthCallback = (req, res) => {
       console.log("Redirecting to request origin:", callbackUrl)
 
       req.session.salesforce = sf
+      req.session.jobs = []
       res.redirect("/")
 
     })
